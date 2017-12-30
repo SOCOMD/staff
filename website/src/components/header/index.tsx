@@ -75,7 +75,7 @@ export default class Header extends Component<any, any> {
 						<List>
 							<List.LinkItem onClick={this.goHome}>
 								<List.ItemIcon>home</List.ItemIcon>
-								Home
+								Dashboard
 							</List.LinkItem>
 							<List.LinkItem onClick={this.goToMyProfile}>
 								<List.ItemIcon>account_circle</List.ItemIcon>

@@ -1,6 +1,6 @@
 var path = require( 'path' );
 var ExtractTextPlugin = require( "extract-text-webpack-plugin" );
-
+var copyWebpackPlugin = require( "copy-webpack-plugin" );
 module.exports = {
 	devtool: 'source-map',
 	entry: [ './src/index' ],
@@ -28,5 +28,8 @@ module.exports = {
 
 			}
 		]
-	}
+	},
+	plugins: [
+		new copyWebpackPlugin( [ { from: 'src/assets/' } ] )
+	]
 };

@@ -17,28 +17,8 @@ var (
 )
 
 func main() {
-	var err error
 
-	dbHost := os.Getenv("DBHOST")
-	dbUser := os.Getenv("DBUSER")
-	dbPass := os.Getenv("DBPASS")
-	dbName := os.Getenv("DBNAME")
-
-	db, err = sql.Open("mysql", dbUser+":"+dbPass+"@tcp("+dbHost+":3306)/"+dbName)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	defer db.Close()
-
-	users, err := user.GetAll(db)
-	if err != nil {
-		fmt.Printf("%s\n", err.Error())
-	}
-
-	for _, v := range users {
-		fmt.Println("User Found", " ID:", v.ID, " SteamID:", v.Steamid, " TSDBID:", v.Tsdbid, " PASS:", v.Password)
-	}
+	dbTest()
 
 	http.HandleFunc("/", handler)
 	log.Println("Listening on localhost:8080")
@@ -46,10 +26,43 @@ func main() {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fs := http.FileServer(http.Dir("./website/dist/"))
+	fs := http.FileServer(http.Dir("../website/dist/"))
 	if strings.Contains(r.URL.String(), ".") == false {
 		r.URL.Path = "/"
 	}
 	fmt.Println(r.URL.String())
 	fs.ServeHTTP(w, r)
+}
+
+func dbTest() {
+
+	fmt.Println("Running DB Tests")
+
+	dbHost := os.Getenv("DBHOST")
+	dbUser := os.Getenv("DBUSER")
+	dbPass := os.Getenv("DBPASS")
+	dbName := os.Getenv("DBNAME")
+
+	db, err := sql.Open("mysql", dbUser+":"+dbPass+"@tcp("+dbHost+":3306)/"+dbName)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	defer db.Close()
+
+	u, err := user.GetSingle(1, db)
+	if err != nil {
+		fmt.Println(err.Error())
+	} else {
+		fmt.Println("User credits =", u.AttendenceCredit)
+	}
+
+	u.AttendenceCredit++
+
+	err = user.UpdateSingle(u, db)
+	if err != nil {
+		fmt.Println(err.Error())
+	} else {
+		fmt.Println("Updated User credits =", u.AttendenceCredit)
+	}
 }

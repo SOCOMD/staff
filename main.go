@@ -5,13 +5,15 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"backend/db/user"
+
+	"github.com/SOCOMD/staff/go/db/user"
 )
 
 func main() {
 	http.HandleFunc("/", handler)
 	log.Println("Listening on localhost:8080")
 	user.GetAll()
+	user.GetSingle(1)
 	http.ListenAndServe(":8080", nil)
 }
 

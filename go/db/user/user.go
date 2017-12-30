@@ -9,5 +9,5 @@ func GetAll() {
 }
 
 func GetSingle(id int) {
-	fmt.Println("Getting User %d", id)
+	fmt.Printf("Getting User %d \n", id)
 }

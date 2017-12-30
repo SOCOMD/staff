@@ -22,6 +22,19 @@ type User struct {
 	AttendenceCredit int    `db:"attendenceCredit"`
 }
 
+func Exists_TS3(tsdbid string, db *sql.DB) (result bool) {
+	result = false
+
+	dbx := sqlx.NewDb(db, "mysql")
+	err := dbx.Get(&result, "SELECT * FROM user WHERE tsdbid=?", tsdbid)
+	if err == nil {
+		result = true
+		return
+	}
+
+	return
+}
+
 //GetAll returns a list of all users from the database
 func GetAll(db *sql.DB) (result []User, err error) {
 	dbx := sqlx.NewDb(db, "mysql")
@@ -72,5 +85,15 @@ func UpdateSingle(user User, db *sql.DB) (err error) {
 		user.Active,
 		user.AttendenceCredit,
 		user.ID)
+	return
+}
+
+//Register_TS3 binds a tsdbid to a db id
+func Register_TS3(tsdbid string, db *sql.DB) (err error) {
+	dbx := sqlx.NewDb(db, "mysql")
+	_, err = dbx.Exec(`INSERT INTO user (tsdbid) VALUES(?)`, tsdbid)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 	return
 }

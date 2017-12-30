@@ -3,6 +3,7 @@ package user
 import (
 	"database/sql"
 	"fmt"
+	"reflect"
 
 	"github.com/SOCOMD/ts3Bot"
 	"github.com/jmoiron/sqlx"
@@ -18,10 +19,14 @@ type User struct {
 	JoinDate         *string `db:"joindate"`
 	DoB              *string `db:"dob"`
 	Gender           *string `db:"gender"`
-	Admin            int     `db:"admin"`
+	Admin            *int    `db:"admin"`
 	Active           int     `db:"active"`
 	AttendenceCredit int     `db:"attendenceCredit"`
 }
+
+var (
+	emptyString string = ""
+)
 
 func (u *User) SafeString(value *string) (result string) {
 	const nilReturn = "isNil"
@@ -37,13 +42,30 @@ func (u *User) SafeString(value *string) (result string) {
 func GetAll(db *sql.DB) (result []User, err error) {
 	dbx := sqlx.NewDb(db, "mysql")
 	err = dbx.Select(&result, "SELECT * FROM user")
+	for _, user := range result {
+		user.reflect()
+	}
 	return
+}
+
+func (u *User) reflect() {
+	val := reflect.ValueOf(u).Elem()
+	for i := 0; i < val.NumField(); i++ {
+		valueField := val.Field(i)
+		typeField := val.Type().Field(i)
+		if valueField.Kind() == reflect.Ptr {
+			if valueField.IsNil() {
+				valueField.Set(reflect.New(typeField.Type.Elem()))
+			}
+		}
+	}
 }
 
 //Get returns a single user from the database
 func Get(id int, db *sql.DB) (result User, err error) {
 	dbx := sqlx.NewDb(db, "mysql")
 	err = dbx.Get(&result, "SELECT * FROM user WHERE id=?", id)
+	result.reflect()
 	return
 }
 

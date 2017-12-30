@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/SOCOMD/ts3Bot"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -22,19 +23,6 @@ type User struct {
 	AttendenceCredit int    `db:"attendenceCredit"`
 }
 
-func Exists_TS3(tsdbid string, db *sql.DB) (result bool) {
-	result = false
-
-	dbx := sqlx.NewDb(db, "mysql")
-	err := dbx.Get(&result, "SELECT * FROM user WHERE tsdbid=?", tsdbid)
-	if err == nil {
-		result = true
-		return
-	}
-
-	return
-}
-
 //GetAll returns a list of all users from the database
 func GetAll(db *sql.DB) (result []User, err error) {
 	dbx := sqlx.NewDb(db, "mysql")
@@ -42,25 +30,25 @@ func GetAll(db *sql.DB) (result []User, err error) {
 	return
 }
 
-//GetSingle returns a single user from the database
-func GetSingle(id int, db *sql.DB) (result User, err error) {
+//Get returns a single user from the database
+func Get(id int, db *sql.DB) (result User, err error) {
 	dbx := sqlx.NewDb(db, "mysql")
 	err = dbx.Get(&result, "SELECT * FROM user WHERE id=?", id)
 	return
 }
 
-//UpdateMultiple will update multiple users at once in the db
-func UpdateMultiple(users []User, db *sql.DB) {
+//UpdateAll will update multiple users at once in the db
+func UpdateAll(users []User, db *sql.DB) {
 	for _, user := range users {
-		updateErr := UpdateSingle(user, db)
+		updateErr := Update(user, db)
 		if updateErr != nil {
 			fmt.Println(updateErr.Error())
 		}
 	}
 }
 
-//UpdateSingle updates a single user in the db
-func UpdateSingle(user User, db *sql.DB) (err error) {
+//Update updates a single user in the db
+func Update(user User, db *sql.DB) (err error) {
 	dbx := sqlx.NewDb(db, "mysql")
 	_, err = dbx.Exec(`UPDATE user SET 
 		steamid=?,
@@ -88,10 +76,25 @@ func UpdateSingle(user User, db *sql.DB) (err error) {
 	return
 }
 
-//Register_TS3 binds a tsdbid to a db id
-func Register_TS3(tsdbid string, db *sql.DB) (err error) {
+//ConvertUserTs3ToDB converts a TS3 user to a db user
+func ConvertUserTs3ToDB(ts3User *ts3Bot.User, db *sql.DB) (user User, err error) {
+	if ts3User == nil {
+		err = fmt.Errorf("ts3 user is nil")
+		return
+	}
+
 	dbx := sqlx.NewDb(db, "mysql")
-	_, err = dbx.Exec(`INSERT INTO user (tsdbid) VALUES(?)`, tsdbid)
+	err = dbx.Get(&user, "SELECT * FROM user WHERE tsdbid=?", ts3User.Dbid)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	return
+}
+
+//ConvertUserSteamToDB converts a steam id to a db user
+func ConvertUserSteamToDB(steamid string, db *sql.DB) (user User, err error) {
+	dbx := sqlx.NewDb(db, "mysql")
+	err = dbx.Get(&user, "SELECT * FROM user WHERE steamid=?", steamid)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

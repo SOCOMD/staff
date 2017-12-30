@@ -22,30 +22,44 @@ var (
 )
 
 func main() {
-	initialise()
-	//generateDBEntries()
-	getDBClientInfo(11)
-	cleanup()
+	// initialise()
+	// testcase()
+	// cleanup()
 
 	hostWebsite()
 }
 
+func hostWebsite() {
+	http.HandleFunc("/", handler)
+	log.Println("Listening on localhost:8080")
+	http.ListenAndServe(":8080", nil)
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	fs := http.FileServer(http.Dir("../website/dist/"))
+	if strings.Contains(r.URL.String(), ".") == false {
+		r.URL.Path = "/"
+	}
+	fmt.Println(r.URL.String())
+	fs.ServeHTTP(w, r)
+}
+
 func initialise() {
 	//Establish DB Connection
-	dbHost := os.Getenv("DBHOST")
-	dbUser := os.Getenv("DBUSER")
-	dbPass := os.Getenv("DBPASS")
-	dbName := os.Getenv("DBNAME")
-	ts3BotAddr := os.Getenv("TS3BOTADDR")
+	envDBHost := os.Getenv("DBHOST")
+	envDBUser := os.Getenv("DBUSER")
+	envDBPass := os.Getenv("DBPASS")
+	envDBName := os.Getenv("DBNAME")
+	envTs3BotAddr := os.Getenv("TS3BOTADDR")
 
 	var err error
-	db, err = sql.Open("mysql", dbUser+":"+dbPass+"@tcp("+dbHost+":3306)/"+dbName)
+	db, err = sql.Open("mysql", envDBUser+":"+envDBPass+"@tcp("+envDBHost+":3306)/"+envDBName)
 	if err != nil {
 		panic(err.Error())
 	}
 
 	//Establish ts3BotClient Connection
-	ts3grpc, err = grpc.Dial(ts3BotAddr, grpc.WithInsecure())
+	ts3grpc, err = grpc.Dial(envTs3BotAddr, grpc.WithInsecure())
 	if err != nil {
 		panic(err.Error())
 	}
@@ -66,71 +80,20 @@ func cleanup() {
 	}
 }
 
-func hostWebsite() {
-	http.HandleFunc("/", handler)
-	log.Println("Listening on localhost:8080")
-	http.ListenAndServe(":8080", nil)
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	fs := http.FileServer(http.Dir("../website/dist/"))
-	if strings.Contains(r.URL.String(), ".") == false {
-		r.URL.Path = "/"
-	}
-	fmt.Println(r.URL.String())
-	fs.ServeHTTP(w, r)
-}
-
-func generateDBEntries() {
-	if ts3Client == nil {
-		panic("invalud ts3client")
+func testcase() {
+	ts3UserList, ts3Err := ts3Client.GetUsers(context.Background(), &ts3Bot.Nil{})
+	if ts3Err != nil {
+		fmt.Println(ts3Err.Error())
+		return
 	}
 
-	userList, err := ts3Client.GetUsers(context.Background(), &ts3Bot.Nil{})
-	if err != nil {
-		panic(err.Error())
-	}
-
-	for _, ts3User := range userList.Users {
-		exists := user.Exists_TS3(ts3User.Dbid, db)
-		if exists == false {
-			user.Register_TS3(ts3User.Dbid, db)
-			continue
-		}
-	}
-
-	dbUsers, err := user.GetAll(db)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	for _, dbUser := range dbUsers {
-		var tsUser ts3Bot.User
-		tsUser.Dbid = dbUser.TeamspeakID
-
-		tsUserPtr, err := ts3Client.GetUser(context.Background(), &tsUser)
+	for _, ts3User := range ts3UserList.Users {
+		dbUser, err := user.ConvertUserTs3ToDB(ts3User, db)
 		if err != nil {
 			fmt.Println(err.Error())
 			continue
 		}
 
-		fmt.Println("User:", " DB_ID:", dbUser.ID, " TS_ID:", dbUser.TeamspeakID, " TS_USERNAME:", tsUserPtr.Name)
+		fmt.Println("Entry:", " ID:", dbUser.ID, " TSID:", dbUser.TeamspeakID, " TSNAME:", ts3User.Name)
 	}
-}
-
-func getDBClientInfo(dbid int) {
-	dbUser, err := user.GetSingle(dbid, db)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	var tsUser ts3Bot.User
-	tsUser.Dbid = dbUser.TeamspeakID
-	tsUserPtr, err := ts3Client.GetUser(context.Background(), &tsUser)
-	if err != nil {
-		panic(err.Error())
-		return
-	}
-
-	fmt.Println("User:", " DB_ID:", dbUser.ID, " TS_ID:", dbUser.TeamspeakID, " TS_USERNAME:", tsUserPtr.Name)
 }

@@ -30,6 +30,6 @@ func GetAll(db *sql.DB) (result []User, err error) {
 //GetSingle returns a single user from the database
 func GetSingle(id int, db *sql.DB) (result User, err error) {
 	dbx := sqlx.NewDb(db, "mysql")
-	err = dbx.Select(&result, "SELECT * FROM user WHERE id=?", id)
+	err = dbx.Get(&result, "SELECT * FROM user WHERE id=?", id)
 	return
 }

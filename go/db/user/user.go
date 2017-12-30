@@ -10,17 +10,27 @@ import (
 
 //User object for db query
 type User struct {
-	ID               int    `db:"id"`
-	SteamID          string `db:"steamid"`
-	TeamspeakID      string `db:"tsdbid"`
-	Email            string `db:"email"`
-	Password         string `db:"password"`
-	JoinDate         string `db:"joindate"`
-	DoB              string `db:"dob"`
-	Gender           string `db:"gender"`
-	Admin            int    `db:"admin"`
-	Active           int    `db:"active"`
-	AttendenceCredit int    `db:"attendenceCredit"`
+	ID               int     `db:"id"`
+	SteamID          *string `db:"steamid"`
+	TeamspeakID      *string `db:"tsdbid"`
+	Email            *string `db:"email"`
+	Password         *string `db:"password"`
+	JoinDate         *string `db:"joindate"`
+	DoB              *string `db:"dob"`
+	Gender           *string `db:"gender"`
+	Admin            int     `db:"admin"`
+	Active           int     `db:"active"`
+	AttendenceCredit int     `db:"attendenceCredit"`
+}
+
+func (u *User) SafeString(value *string) (result string) {
+	const nilReturn = "isNil"
+	if value == nil {
+		result = nilReturn
+		return
+	}
+	result = *value
+	return
 }
 
 //GetAll returns a list of all users from the database

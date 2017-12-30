@@ -22,11 +22,11 @@ var (
 )
 
 func main() {
-	// initialise()
-	// testcase()
-	// cleanup()
+	initialise()
+	testcase()
+	cleanup()
 
-	hostWebsite()
+	//hostWebsite()
 }
 
 func hostWebsite() {
@@ -93,6 +93,7 @@ func testcase() {
 			continue
 		}
 
-		fmt.Println("Entry:", " ID:", dbUser.ID, " TSID:", dbUser.TeamspeakID, " TSNAME:", ts3User.Name)
+		fmt.Println("Entry:", " ID:", dbUser.ID, " TSID:", dbUser.SafeString(dbUser.TeamspeakID), " TSNAME:", ts3User.Name, " STEAMID:", dbUser.SafeString(dbUser.SteamID))
+
 	}
 }

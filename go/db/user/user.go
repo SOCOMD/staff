@@ -10,15 +10,16 @@ import (
 //User object for db query
 type User struct {
 	ID               int    `db:"id"`
-	Steamid          string `db:"steamid"`
-	Tsdbid           string `db:"tsdbid"`
+	SteamID          string `db:"steamid"`
+	TeamspeakID      string `db:"tsdbid"`
 	Email            string `db:"email"`
-	Joindate         string `db:"joindate"`
-	Dob              string `db:"dob"`
+	Password         string `db:"password"`
+	JoinDate         string `db:"joindate"`
+	DoB              string `db:"dob"`
 	Gender           string `db:"gender"`
 	Admin            int    `db:"admin"`
+	Active           int    `db:"active"`
 	AttendenceCredit int    `db:"attendenceCredit"`
-	Password         string `db:"password"`
 }
 
 //GetAll returns a list of all users from the database
@@ -52,22 +53,24 @@ func UpdateSingle(user User, db *sql.DB) (err error) {
 		steamid=?,
 		tsdbid=?,
 		email=?,
+		password=?,
 		joindate=?,
 		dob=?,
 		gender=?,
 		admin=?,
-		attendenceCredit=?,
-		password=?
+		active=?,
+		attendenceCredit=?
 		WHERE id=?`,
-		user.Steamid,
-		user.Tsdbid,
+		user.SteamID,
+		user.TeamspeakID,
 		user.Email,
-		user.Joindate,
-		user.Dob,
+		user.Password,
+		user.JoinDate,
+		user.DoB,
 		user.Gender,
 		user.Admin,
+		user.Active,
 		user.AttendenceCredit,
-		user.Password,
 		user.ID)
 	return
 }

@@ -5,8 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
-
-	"github.com/SOCOMD/staff/backend/db/user"
+	"backend/db/user"
 )
 
 func main() {

@@ -7,3 +7,7 @@ import (
 func GetAll() {
 	fmt.Println("Called: Get User")
 }
+
+func GetSingle(id int) {
+	fmt.Println("Getting User %d", id)
+}

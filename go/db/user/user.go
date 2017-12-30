@@ -117,9 +117,6 @@ func ConvertUserTs3ToDB(ts3User *ts3Bot.User, db *sql.DB) (user User, err error)
 
 	dbx := sqlx.NewDb(db, "mysql")
 	err = dbx.Get(&user, "SELECT * FROM user WHERE tsdbid=?", ts3User.Dbid)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
 	return
 }
 
@@ -127,8 +124,17 @@ func ConvertUserTs3ToDB(ts3User *ts3Bot.User, db *sql.DB) (user User, err error)
 func ConvertUserSteamToDB(steamid string, db *sql.DB) (user User, err error) {
 	dbx := sqlx.NewDb(db, "mysql")
 	err = dbx.Get(&user, "SELECT * FROM user WHERE steamid=?", steamid)
-	if err != nil {
-		fmt.Println(err.Error())
+	return
+}
+
+//AddTs3User add a new DB user from ts3 user
+func AddTs3User(ts3User *ts3Bot.User, db *sql.DB) (err error) {
+	if ts3User == nil {
+		err = fmt.Errorf("ts3 user is nil")
+		return
 	}
+
+	dbx := sqlx.NewDb(db, "mysql")
+	_, err = dbx.Exec("INSERT INTO user (tsdbid) VALUES (?)", ts3User.Dbid)
 	return
 }

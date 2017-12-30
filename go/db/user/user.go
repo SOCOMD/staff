@@ -10,27 +10,17 @@ import (
 
 //User object for db query
 type User struct {
-	ID               int     `db:"id"`
-	SteamID          *string `db:"steamid"`
-	TeamspeakID      *string `db:"tsdbid"`
-	Email            *string `db:"email"`
-	Password         *string `db:"password"`
-	JoinDate         *string `db:"joindate"`
-	DoB              *string `db:"dob"`
-	Gender           *string `db:"gender"`
-	Admin            int     `db:"admin"`
-	Active           int     `db:"active"`
-	AttendenceCredit int     `db:"attendenceCredit"`
-}
-
-func (u *User) SafeString(value *string) (result string) {
-	const nilReturn = "isNil"
-	if value == nil {
-		result = nilReturn
-		return
-	}
-	result = *value
-	return
+	ID               int            `db:"id"`
+	SteamID          sql.NullString `db:"steamid"`
+	TeamspeakID      sql.NullString `db:"tsdbid"`
+	Email            sql.NullString `db:"email"`
+	Password         sql.NullString `db:"password"`
+	JoinDate         sql.NullString `db:"joindate"`
+	DoB              sql.NullString `db:"dob"`
+	Gender           sql.NullString `db:"gender"`
+	Admin            int            `db:"admin"`
+	Active           int            `db:"active"`
+	AttendenceCredit int            `db:"attendenceCredit"`
 }
 
 //GetAll returns a list of all users from the database
@@ -95,9 +85,6 @@ func ConvertUserTs3ToDB(ts3User *ts3Bot.User, db *sql.DB) (user User, err error)
 
 	dbx := sqlx.NewDb(db, "mysql")
 	err = dbx.Get(&user, "SELECT * FROM user WHERE tsdbid=?", ts3User.Dbid)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
 	return
 }
 
@@ -105,8 +92,17 @@ func ConvertUserTs3ToDB(ts3User *ts3Bot.User, db *sql.DB) (user User, err error)
 func ConvertUserSteamToDB(steamid string, db *sql.DB) (user User, err error) {
 	dbx := sqlx.NewDb(db, "mysql")
 	err = dbx.Get(&user, "SELECT * FROM user WHERE steamid=?", steamid)
-	if err != nil {
-		fmt.Println(err.Error())
+	return
+}
+
+//AddTs3User add a new DB user from ts3 user
+func AddTs3User(ts3User *ts3Bot.User, db *sql.DB) (err error) {
+	if ts3User == nil {
+		err = fmt.Errorf("ts3 user is nil")
+		return
 	}
+
+	dbx := sqlx.NewDb(db, "mysql")
+	_, err = dbx.Exec("INSERT INTO user (tsdbid) VALUES (?)", ts3User.Dbid)
 	return
 }

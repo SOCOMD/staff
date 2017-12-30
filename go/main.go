@@ -90,10 +90,14 @@ func testcase() {
 	for _, ts3User := range ts3UserList.Users {
 		dbUser, err := user.ConvertUserTs3ToDB(ts3User, db)
 		if err != nil {
-			continue
+			user.AddTs3User(ts3User, db)
+			dbUser, err = user.ConvertUserTs3ToDB(ts3User, db)
+			if err != nil {
+				fmt.Println(err.Error())
+				continue
+			}
 		}
 
-		fmt.Println("Entry:", " ID:", dbUser.ID, " TSID:", dbUser.SafeString(dbUser.TeamspeakID), " TSNAME:", ts3User.Name, " STEAMID:", dbUser.SafeString(dbUser.SteamID))
-
+		fmt.Println("Entry:", " ID:", dbUser.ID, " TSID:", dbUser.TeamspeakID.String, " TSNAME:", ts3User.Name)
 	}
 }

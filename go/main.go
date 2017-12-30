@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -9,47 +10,89 @@ import (
 	"strings"
 
 	"github.com/SOCOMD/staff/go/db/user"
+	"github.com/SOCOMD/ts3Bot"
 	_ "github.com/go-sql-driver/mysql"
+	"google.golang.org/grpc"
 )
 
 var (
-	db *sql.DB
+	db        *sql.DB
+	ts3grpc   *grpc.ClientConn
+	ts3Client ts3Bot.Ts3BotClient
 )
 
 func main() {
-	var err error
+	// initialise()
+	// testcase()
+	// cleanup()
 
-	dbHost := os.Getenv("DBHOST")
-	dbUser := os.Getenv("DBUSER")
-	dbPass := os.Getenv("DBPASS")
-	dbName := os.Getenv("DBNAME")
+	hostWebsite()
+}
 
-	db, err = sql.Open("mysql", dbUser+":"+dbPass+"@tcp("+dbHost+":3306)/"+dbName)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	defer db.Close()
-
-	users, err := user.GetAll(db)
-	if err != nil {
-		fmt.Printf("%s\n", err.Error())
-	}
-
-	for _, v := range users {
-		fmt.Println("User Found", " ID:", v.ID, " SteamID:", v.Steamid, " TSDBID:", v.Tsdbid, " PASS:", v.Password)
-	}
-
+func hostWebsite() {
 	http.HandleFunc("/", handler)
 	log.Println("Listening on localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fs := http.FileServer(http.Dir("./website/dist/"))
+	fs := http.FileServer(http.Dir("../website/dist/"))
 	if strings.Contains(r.URL.String(), ".") == false {
 		r.URL.Path = "/"
 	}
 	fmt.Println(r.URL.String())
 	fs.ServeHTTP(w, r)
+}
+
+func initialise() {
+	//Establish DB Connection
+	envDBHost := os.Getenv("DBHOST")
+	envDBUser := os.Getenv("DBUSER")
+	envDBPass := os.Getenv("DBPASS")
+	envDBName := os.Getenv("DBNAME")
+	envTs3BotAddr := os.Getenv("TS3BOTADDR")
+
+	var err error
+	db, err = sql.Open("mysql", envDBUser+":"+envDBPass+"@tcp("+envDBHost+":3306)/"+envDBName)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	//Establish ts3BotClient Connection
+	ts3grpc, err = grpc.Dial(envTs3BotAddr, grpc.WithInsecure())
+	if err != nil {
+		panic(err.Error())
+	}
+
+	ts3Client = ts3Bot.NewTs3BotClient(ts3grpc)
+	if ts3Client == nil {
+		panic(err.Error())
+	}
+}
+
+func cleanup() {
+	if db != nil {
+		db.Close()
+	}
+
+	if ts3grpc != nil {
+		ts3grpc.Close()
+	}
+}
+
+func testcase() {
+	ts3UserList, ts3Err := ts3Client.GetUsers(context.Background(), &ts3Bot.Nil{})
+	if ts3Err != nil {
+		fmt.Println(ts3Err.Error())
+		return
+	}
+
+	for _, ts3User := range ts3UserList.Users {
+		dbUser, err := user.ConvertUserTs3ToDB(ts3User, db)
+		if err != nil {
+			continue
+		}
+
+		fmt.Println("Entry:", " ID:", dbUser.ID, " TSID:", dbUser.TeamspeakID, " TSNAME:", ts3User.Name)
+	}
 }

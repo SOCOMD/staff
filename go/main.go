@@ -90,7 +90,6 @@ func testcase() {
 	for _, ts3User := range ts3UserList.Users {
 		dbUser, err := user.ConvertUserTs3ToDB(ts3User, db)
 		if err != nil {
-			fmt.Println(err.Error())
 			continue
 		}
 

@@ -4,10 +4,12 @@ import (
 	"fmt"
 )
 
+//GetAll returns a list of all users from the database
 func GetAll() {
-	fmt.Println("Called: Get User")
+	fmt.Printf("Get all users\n")
 }
 
+//GetSingle returns a single user from the database
 func GetSingle(id int) {
-	fmt.Printf("Getting User %d \n", id)
+	fmt.Printf("Get user with id:%d \n", id)
 }

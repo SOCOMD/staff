@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -80,7 +81,7 @@ func cleanup() {
 }
 
 func testcase() {
-	/*ts3UserList, ts3Err := ts3Client.GetUsers(context.Background(), &ts3Bot.Nil{})
+	ts3UserList, ts3Err := ts3Client.GetUsers(context.Background(), &ts3Bot.Nil{})
 	if ts3Err != nil {
 		fmt.Println(ts3Err.Error())
 		return
@@ -99,10 +100,5 @@ func testcase() {
 
 		fmt.Println("Entry:", " ID:", dbUser.ID, " TSID:", dbUser.SafeString(dbUser.TeamspeakID), " TSNAME:", ts3User.Name, " STEAMID:", dbUser.SafeString(dbUser.SteamID))
 
-	}*/
-	u, err := user.Get(1, db)
-	if err != nil {
-		fmt.Println(err)
 	}
-	fmt.Printf("%#v\n", u)
 }

@@ -29,13 +29,10 @@ var (
 )
 
 func (u *User) SafeString(value *string) (result string) {
-	const nilReturn = "isNil"
 	if value == nil {
-		result = nilReturn
-		return
+		return ""
 	}
-	result = *value
-	return
+	return *value
 }
 
 //GetAll returns a list of all users from the database

@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"reflect"
@@ -14,6 +15,7 @@ type User struct {
 	ID               int     `db:"id"`
 	SteamID          *string `db:"steamid"`
 	TeamspeakID      *string `db:"tsdbid"`
+	TeamspeakUUID    *string `db:"tsuuid"`
 	Email            *string `db:"email"`
 	Password         *string `db:"password"`
 	JoinDate         *string `db:"joindate"`
@@ -124,14 +126,25 @@ func ConvertUserSteamToDB(steamid string, db *sql.DB) (user User, err error) {
 	return
 }
 
-//AddTs3User add a new DB user from ts3 user
-func AddTs3User(ts3User *ts3Bot.User, db *sql.DB) (err error) {
-	if ts3User == nil {
-		err = fmt.Errorf("ts3 user is nil")
-		return
+//Validate validate user by steamid and ts3uuid
+func Validate(steamid string, ts3Uuid string, db *sql.DB) (user User, err error) {
+	dbx := sqlx.NewDb(db, "mysql")
+	err = dbx.Get(&user, "SELECT * FROM user WHERE steamid=? OR tsuuid=?", steamid, ts3Uuid)
+	return
+}
+
+//Register a user into the DB with steamid and ts3uuid
+func Register(steamid string, ts3Uuid string, ts3Client ts3Bot.Ts3BotClient, db *sql.DB) (err error) {
+
+	var ts3QueryUser ts3Bot.User
+	ts3QueryUser.Uuid = ts3Uuid
+
+	ts3User, ts3Err := ts3Client.GetUser(context.Background(), &ts3QueryUser)
+	if ts3Err != nil {
+		return ts3Err
 	}
 
 	dbx := sqlx.NewDb(db, "mysql")
-	_, err = dbx.Exec("INSERT INTO user (tsdbid) VALUES (?)", ts3User.Dbid)
+	_, err = dbx.Exec("INSERT INTO user (steamid,tsdbid,tsuuid) VALUES (?,?,?)", steamid, ts3User.Dbid, ts3User.Uuid)
 	return
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -9,7 +8,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/SOCOMD/staff/go/db/user"
 	"github.com/SOCOMD/ts3Bot"
 	_ "github.com/go-sql-driver/mysql"
 	"google.golang.org/grpc"
@@ -81,24 +79,37 @@ func cleanup() {
 }
 
 func testcase() {
-	ts3UserList, ts3Err := ts3Client.GetUsers(context.Background(), &ts3Bot.Nil{})
-	if ts3Err != nil {
-		fmt.Println(ts3Err.Error())
-		return
-	}
 
-	for _, ts3User := range ts3UserList.Users {
-		dbUser, err := user.ConvertUserTs3ToDB(ts3User, db)
-		if err != nil {
-			user.AddTs3User(ts3User, db)
-			dbUser, err = user.ConvertUserTs3ToDB(ts3User, db)
-			if err != nil {
-				fmt.Println(err.Error())
-				continue
-			}
-		}
+	//// Get Sinle TS3 User by setting search user data
+	// var ts3SearchUser ts3Bot.User
+	// ts3SearchUser.Uuid = `vNfQp42gNSmnZXzwycVTamagAvE=`
+	// ts3User, ts3Err := ts3Client.GetUser(context.Background(), &ts3SearchUser)
+	// if ts3Err != nil {
+	// 	fmt.Println(ts3Err.Error())
+	// 	return
+	// }
 
-		fmt.Println("Entry:", " ID:", dbUser.ID, " TSID:", dbUser.SafeString(dbUser.TeamspeakID), " TSNAME:", ts3User.Name, " STEAMID:", dbUser.SafeString(dbUser.SteamID))
+	// fmt.Println("Entry:", " TSNAME:", ts3User.Name, " TSDBID:", ts3User.Dbid, " TSUUID:", ts3User.Uuid, " TSLASTCONN:", ts3User.Lastconnected)
 
-	}
+	////Get all ts3clients and add them to the DB
+	// ts3UserList, ts3Err := ts3Client.GetUsers(context.Background(), &ts3Bot.Nil{})
+	// if ts3Err != nil {
+	// 	fmt.Println(ts3Err.Error())
+	// 	return
+	// }
+
+	// for _, ts3User := range ts3UserList.Users {
+	// 	dbUser, err := user.ConvertUserTs3ToDB(ts3User, db)
+	// 	if err != nil {
+	// 		user.AddTs3User(ts3User, db)
+	// 		dbUser, err = user.ConvertUserTs3ToDB(ts3User, db)
+	// 		if err != nil {
+	// 			fmt.Println(err.Error())
+	// 			continue
+	// 		}
+	// 	}
+
+	// 	fmt.Println("Entry:", " ID:", dbUser.ID, " TSID:", dbUser.SafeString(dbUser.TeamspeakID), " TSNAME:", ts3User.Name, " STEAMID:", dbUser.SafeString(dbUser.SteamID))
+
+	// }
 }

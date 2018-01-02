@@ -35,7 +35,7 @@ func initialise() {
 	jwtsecret = []byte(os.Getenv("ACC_JWTSECRET"))
 
 	//Connect Clients
-	dbClient.Serve()
+	dbClient.Connect()
 	ts3BotClient.Connect()
 
 	//Host Servers

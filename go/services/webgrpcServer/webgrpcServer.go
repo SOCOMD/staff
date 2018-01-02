@@ -8,11 +8,12 @@ import (
 	"os"
 	"strconv"
 
-	"google.golang.org/grpc/codes"
+	"github.com/SOCOMD/ts3Bot"
 
 	grpcMembers "github.com/SOCOMD/staff"
-	dbUser "github.com/SOCOMD/staff/go/db/user"
+	usr "github.com/SOCOMD/staff/go/db/user"
 	"github.com/SOCOMD/staff/go/services/dbClient"
+	"github.com/SOCOMD/staff/go/services/ts3BotClient"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
@@ -71,21 +72,34 @@ type memberService struct{}
 
 func (s *memberService) GetUser(ctx context.Context, userQuery *grpcMembers.GetUserMessage) (user *grpcMembers.User, err error) {
 
-	dbInstance := dbClient.GetDBInstance()
-	if dbInstance == nil {
-		return nil, grpc.Errorf(codes.Unavailable, "MySQL Database Instance is nil")
+	dbInstance, dberr := dbClient.GetDBInstance()
+	if dberr != nil {
+		return nil, dberr
+	}
+
+	ts3BotInstance, ts3err := ts3BotClient.GetTs3BotInstance()
+	if ts3err != nil {
+		return nil, ts3err
 	}
 
 	id, _ := strconv.Atoi(userQuery.Id)
-	res, err := dbUser.Get(id, dbInstance)
+	dbUser, err := usr.Get(id, dbInstance)
 	if err != nil {
 		return nil, err
 	}
 
+	var ts3Query ts3Bot.User
+	ts3Query.Uuid = *dbUser.TeamspeakUUID
+
+	ts3User, ts3err := ts3BotInstance.GetUser(context.Background(), &ts3Query)
+	if ts3err != nil {
+		return nil, err
+	}
+
 	var retUsr grpcMembers.User
-	retUsr.TsName = *res.TeamspeakID
-	retUsr.Tsuuid = *res.TeamspeakUUID
-	retUsr.Email = *res.Email
+	retUsr.TsName = ts3User.Name
+	retUsr.Tsuuid = *dbUser.TeamspeakUUID
+	retUsr.Email = *dbUser.Email
 
 	return &retUsr, nil
 }

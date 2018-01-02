@@ -11,7 +11,7 @@ var (
 	dbInstance *sql.DB
 )
 
-func Serve() {
+func Connect() {
 	dbHost := os.Getenv("HOST")
 	dbHostOverride := os.Getenv("HOST_DB")
 	if len(dbHostOverride) > 0 {
@@ -39,6 +39,9 @@ func Disconnect() {
 	}
 }
 
-func GetDBInstance() (db *sql.DB) {
-	return dbInstance
+func GetDBInstance() (db *sql.DB, err error) {
+	if dbInstance == nil {
+		return nil, fmt.Errorf("MySQL Database Instance is nil")
+	}
+	return dbInstance, nil
 }

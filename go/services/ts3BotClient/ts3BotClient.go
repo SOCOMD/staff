@@ -34,6 +34,7 @@ func Connect() (err error) {
 		return fmt.Errorf("Failed to create TS3 Bot Client")
 	}
 
+	fmt.Println("ts3 bot connection successful")
 	return
 }
 
@@ -41,4 +42,11 @@ func Disconnect() {
 	if grpcClient != nil {
 		grpcClient.Close()
 	}
+}
+
+func GetTs3BotInstance() (ts3Bot.Ts3BotClient, error) {
+	if ts3Client == nil {
+		return nil, fmt.Errorf("Ts3 Bot Client has not been connected")
+	}
+	return ts3Client, nil
 }

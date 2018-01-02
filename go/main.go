@@ -1,74 +1,63 @@
 package main
 
 import (
-	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/SOCOMD/ts3Bot"
+	"github.com/SOCOMD/staff/go/services/dbClient"
+	"github.com/SOCOMD/staff/go/services/ts3BotClient"
+	"github.com/SOCOMD/staff/go/services/webgrpcServer"
 	_ "github.com/go-sql-driver/mysql"
-	"google.golang.org/grpc"
 )
 
 var (
-	db         *sql.DB
-	ts3grpc    *grpc.ClientConn
-	ts3Client  ts3Bot.Ts3BotClient
 	webAddress string
 	jwtsecret  []byte
 )
 
 func main() {
 	initialise()
-	hostWebsite()
-	//testcase()
 	cleanup()
+}
 
+func initialise() {
+
+	webHost := os.Getenv("HOST")
+	webHostOverride := os.Getenv("HOST_WEBHOST")
+	if len(webHostOverride) > 0 {
+		fmt.Printf("Using WebHost override!")
+		webHost = webHostOverride
+	}
+
+	webAddress = fmt.Sprintf("%s:%s", webHost, os.Getenv("PORT_WEBHOST"))
+	jwtsecret = []byte(os.Getenv("ACC_JWTSECRET"))
+
+	//Connect Clients
+	dbClient.Serve()
+	ts3BotClient.Connect()
+
+	//Host Servers
+	webgrpcServer.Serve()
+	hostWebsite()
+
+}
+
+func cleanup() {
+	//Disconnect Clients
+	dbClient.Disconnect()
+	ts3BotClient.Disconnect()
+
+	//Disconnect Servers
+	webgrpcServer.Disconnect()
 }
 
 func hostWebsite() {
 	http.HandleFunc("/steamlogin", steamLoginHandler)
 	http.HandleFunc("/steamcallback", steamCallbackHandler)
 	http.HandleFunc("/", handler)
+
 	log.Println("Listening on", webAddress)
 	log.Println(http.ListenAndServe(webAddress, nil))
-}
-
-func initialise() {
-	//Establish DB Connection
-	envDBHost := os.Getenv("DBHOST")
-	envDBUser := os.Getenv("DBUSER")
-	envDBPass := os.Getenv("DBPASS")
-	envDBName := os.Getenv("DBNAME")
-	envTs3BotAddr := os.Getenv("TS3BOTADDR")
-	webAddress = os.Getenv("MEMBERS_WEBHOST") + ":" + os.Getenv("MEMBERS_WEBPORT")
-	jwtsecret = []byte(os.Getenv("MEMBERS_JWTSECRET"))
-
-	var err error
-	db, err = sql.Open("mysql", envDBUser+":"+envDBPass+"@tcp("+envDBHost+":3306)/"+envDBName)
-	if err != nil {
-		log.Println(err.Error())
-	}
-
-	//Establish ts3BotClient Connection
-	ts3grpc, err = grpc.Dial(envTs3BotAddr, grpc.WithInsecure())
-	if err != nil {
-		log.Println(err.Error())
-	}
-
-	ts3Client = ts3Bot.NewTs3BotClient(ts3grpc)
-	if ts3Client == nil {
-		log.Println(err.Error())
-	}
-}
-
-func cleanup() {
-	if db != nil {
-		db.Close()
-	}
-
-	if ts3grpc != nil {
-		ts3grpc.Close()
-	}
 }

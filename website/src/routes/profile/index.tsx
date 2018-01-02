@@ -91,33 +91,73 @@ export default class Profile extends Component<any, any> {
 		)
 	}
 
+	formatDate(date) {
+		var d = new Date(date),
+			month = '' + (d.getMonth() + 1),
+			day = '' + d.getDate(),
+			year = d.getFullYear();
+	
+		if (month.length < 2) month = '0' + month;
+		if (day.length < 2) day = '0' + day;
+	
+		return [year, month, day].join('-');
+	}
+
 	renderProfileCard({rpcUser}) {
 
+		var isDisabled = true
 		if(rpcUser == null) {
 			return;
 		}
+
+		console.log()
 		
 		return (
 			<div>
 				<Card>
 					<Card.Primary>
-						<h1>Profile</h1>
+						<h1>Profile:{rpcUser.tsname}</h1>
 						<LayoutGrid>
 							<LayoutGrid.Inner>
-								<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={true} helperText="Teamspeak Name" value={rpcUser.tsname}/>
+							<LayoutGrid.Cell cols={4}>
+									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="ID" value={rpcUser.id}/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={true} helperText="Teamspeak Unique ID" value={rpcUser.tsuuid}/>
+									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Teamspeak ID" value={rpcUser.tsdbid}/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={false} helperText="Email" value={rpcUser.email}/>
+									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Teamspeak Unique ID" value={rpcUser.tsuuid}/>
 								</LayoutGrid.Cell>
-								
+								<LayoutGrid.Cell cols={4}>
+									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Teamspeak Name" value={rpcUser.tsname}/>
+								</LayoutGrid.Cell>
+								<LayoutGrid.Cell cols={4}>
+									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Teamspeak Created" value={new Date(parseInt(rpcUser.tscreated) * 1000).toISOString().slice(0, 10)} type="date"/>
+								</LayoutGrid.Cell>
+								<LayoutGrid.Cell cols={4}>
+									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Teamspeak Last Connected" value={new Date(parseInt(rpcUser.tslastconnected) * 1000).toISOString().slice(0, 10)} type="date"/>
+								</LayoutGrid.Cell>
+								<LayoutGrid.Cell cols={4}>
+									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Email" value={rpcUser.email}/>
+								</LayoutGrid.Cell>
+								<LayoutGrid.Cell cols={4}>
+									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Join Date" value={rpcUser.joindate} type="date"/>
+								</LayoutGrid.Cell>
+								<LayoutGrid.Cell cols={4}>
+									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Date of Birth" value={rpcUser.dob} type="date"/>
+								</LayoutGrid.Cell>
+								<LayoutGrid.Cell cols={4}>
+									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Gender" value={rpcUser.gender}/>
+								</LayoutGrid.Cell>
+								<LayoutGrid.Cell cols={4}>
+									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Active" value={rpcUser.active}/>
+								</LayoutGrid.Cell>
+								<LayoutGrid.Cell cols={4}>
+									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Admin" value={rpcUser.admin} type="number"/>
+								</LayoutGrid.Cell>
 							</LayoutGrid.Inner>
 						</LayoutGrid>
 					</Card.Primary>
-					<Card.Action onClick={()=>{this.scrollingDlg.MDComponent.show();}}>update</Card.Action>
 				</Card>
 
 				<Dialog ref={scrollingDlg=>{this.scrollingDlg=scrollingDlg;}}>
@@ -138,7 +178,6 @@ export default class Profile extends Component<any, any> {
 	render({ user }, {time, count, rpcUser}) {
 		return (
 			<div className="profile">
-				<h1>Profile:{user}</h1>
 				<this.renderProfileCard rpcUser={rpcUser}/>
 			</div>
 		);

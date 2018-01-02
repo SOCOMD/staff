@@ -97,9 +97,18 @@ func (s *memberService) GetUser(ctx context.Context, userQuery *grpcMembers.GetU
 	}
 
 	var retUsr grpcMembers.User
+	retUsr.Id = strconv.Itoa(dbUser.ID)
 	retUsr.TsName = ts3User.Name
-	retUsr.Tsuuid = *dbUser.TeamspeakUUID
+	retUsr.Tsdbid = ts3User.Dbid
+	retUsr.Tsuuid = ts3User.Uuid
+	retUsr.Tscreated = ts3User.Created
+	retUsr.Tslastconnected = ts3User.Lastconnected
 	retUsr.Email = *dbUser.Email
+	retUsr.Active = dbUser.Active > 0
+	retUsr.Admin = dbUser.Admin
+	retUsr.Dob = *dbUser.DoB
+	retUsr.Gender = *dbUser.Gender
+	retUsr.Joindate = *dbUser.JoinDate
 
 	return &retUsr, nil
 }

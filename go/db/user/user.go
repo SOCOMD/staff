@@ -21,9 +21,9 @@ type User struct {
 	JoinDate         *string `db:"joindate"`
 	DoB              *string `db:"dob"`
 	Gender           *string `db:"gender"`
-	Admin            *int    `db:"admin"`
-	Active           int     `db:"active"`
-	AttendenceCredit int     `db:"attendenceCredit"`
+	Admin            int32   `db:"admin"`
+	Active           int32   `db:"active"`
+	AttendenceCredit int32   `db:"attendenceCredit"`
 }
 
 var (

@@ -67,13 +67,10 @@ export default class Profile extends Component<any, any> {
 		var request = new GetUserMessage;
 		request.setId("277");
 
-		//TODO: GET REQUEST HOST ADDR FROM ENV VARS
-		var requestHost = "http://127.0.0.1:8081"
-
 		grpc.unary(members.GetUser, {
 			debug:true,
 			request: request,
-			host: requestHost,
+			host: process.env.webgrpc_host,
 			onEnd: res => {
 				const { status, statusMessage, headers, message, trailers } = res;
 					if(status != Code.OK || !message) {

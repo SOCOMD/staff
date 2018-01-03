@@ -33,9 +33,7 @@ export default class Profile extends Component<any, any> {
 
 	scrollingDlg: any
 	state = {
-		time: Date.now(),
-		count:0,
-		rpcUser:null
+		rpcUser: null
 	};
 
 	// gets called when this route is navigated to
@@ -72,7 +70,6 @@ export default class Profile extends Component<any, any> {
 
 	requestUserData() {
 
-		//TODO: GET USER ID FROM ROUTE
 		var request = new GetUserMessage;
 		var profileID = this.extractProfileID()
 		request.setId(profileID);
@@ -92,79 +89,78 @@ export default class Profile extends Component<any, any> {
 						return						
 					}
 
-					this.setState({rpcUser: response.toObject()})
+					this.setFieldValues(response)
 				}
 			}
 		)
 	}
 
-	formatDate(date) {
-		var d = new Date(date),
-			month = '' + (d.getMonth() + 1),
-			day = '' + d.getDate(),
-			year = d.getFullYear();
-	
-		if (month.length < 2) month = '0' + month;
-		if (day.length < 2) day = '0' + day;
-	
-		return [year, month, day].join('-');
-	}
-
-	renderProfileCard({rpcUser}) {
-
-		var isDisabled = true
+	setFieldValues(rpcUser : User) {
 		if(rpcUser == null) {
-			return;
+			return;			
 		}
 
-		console.log()
+		this.setState({rpcUser: rpcUser.toObject()})
+
+		document.getElementById("tsuuid").setAttribute("value",this.state.rpcUser.tsuuid)
+		document.getElementById("tsname").setAttribute("value", this.state.rpcUser.tsname)
+		document.getElementById("tscreated").setAttribute("value", new Date(parseInt(this.state.rpcUser.tscreated) * 1000).toISOString().slice(0, 10))
+		document.getElementById("tslastconnected").setAttribute("value", new Date(parseInt(this.state.rpcUser.tslastconnected) * 1000).toISOString().slice(0, 10))
+		document.getElementById("email").setAttribute("value", this.state.rpcUser.email)
+		document.getElementById("joindate").setAttribute("value", this.state.rpcUser.joindate)
+		document.getElementById("dob").setAttribute("value", this.state.rpcUser.dob)
+		document.getElementById("gender").setAttribute("value", this.state.rpcUser.gender)
+		document.getElementById("active").setAttribute("value", this.state.rpcUser.active)
+		document.getElementById("admin").setAttribute("value", this.state.rpcUser.admin)
+
+		//document.getElementById("performUpdate").addEventListener("click", (e:Event) => this.onFormSubmit());
+	}
+
+	renderProfileCard({user}) {
+
+		var viewMode = true
 		
 		return (
 			<div>
 				<Card>
 					<Card.Primary>
-						<h1>Profile:{rpcUser.tsname}</h1>
+						<h1>Member - {user}</h1>
 						<LayoutGrid>
 							<LayoutGrid.Inner>
 							<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="ID" value={rpcUser.id}/>
+									<TextField id="tsname" fullwidth={true} helperTextPersistent={true} disabled={true} helperText="Teamspeak Name" />
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Teamspeak ID" value={rpcUser.tsdbid}/>
+									<TextField id="email" fullwidth={true} helperTextPersistent={true} disabled={viewMode} helperText="Email"/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Teamspeak Unique ID" value={rpcUser.tsuuid}/>
+									<TextField id="tsuuid" fullwidth={true} helperTextPersistent={true} disabled={viewMode} helperText="Teamspeak Unique ID" />
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Teamspeak Name" value={rpcUser.tsname}/>
+									<TextField id="tscreated" fullwidth={true} helperTextPersistent={true} disabled={true} helperText="Teamspeak Created" type="date"/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Teamspeak Created" value={new Date(parseInt(rpcUser.tscreated) * 1000).toISOString().slice(0, 10)} type="date"/>
+									<TextField id="tslastconnected" fullwidth={true} helperTextPersistent={true} disabled={true} helperText="Teamspeak Last Connected" type="date"/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Teamspeak Last Connected" value={new Date(parseInt(rpcUser.tslastconnected) * 1000).toISOString().slice(0, 10)} type="date"/>
+									<TextField id="joindate" fullwidth={true} helperTextPersistent={true} disabled={true} helperText="Join Date" type="date"/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Email" value={rpcUser.email}/>
+									<TextField id="dob" fullwidth={true} helperTextPersistent={true} disabled={true} helperText="Date of Birth" type="date"/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Join Date" value={rpcUser.joindate} type="date"/>
+									<TextField id="gender" fullwidth={true} helperTextPersistent={true} disabled={viewMode} helperText="Gender"/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Date of Birth" value={rpcUser.dob} type="date"/>
+									<TextField id="active" fullwidth={true} helperTextPersistent={true} disabled={viewMode} helperText="Active"/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Gender" value={rpcUser.gender}/>
-								</LayoutGrid.Cell>
-								<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Active" value={rpcUser.active}/>
-								</LayoutGrid.Cell>
-								<LayoutGrid.Cell cols={4}>
-									<TextField fullwidth={true} helperTextPersistent={true} disabled={isDisabled} helperText="Admin" value={rpcUser.admin} type="number"/>
+									<TextField id="admin" fullwidth={true} helperTextPersistent={true} disabled={viewMode} helperText="Admin" type="number"/>
 								</LayoutGrid.Cell>
 							</LayoutGrid.Inner>
 						</LayoutGrid>
 					</Card.Primary>
+					<Card.Action onClick={()=>{this.scrollingDlg.MDComponent.show();}}>Update</Card.Action>
 				</Card>
 
 				<Dialog ref={scrollingDlg=>{this.scrollingDlg=scrollingDlg;}}>
@@ -174,7 +170,7 @@ export default class Profile extends Component<any, any> {
 					</Dialog.Body>
 					<Dialog.Footer>
 						<Dialog.FooterButton cancel={true}>Cancel</Dialog.FooterButton>
-						<Dialog.FooterButton accept={true}>Update</Dialog.FooterButton>
+						<Dialog.FooterButton id="performUpdate" accept={true}>Update</Dialog.FooterButton>
 					</Dialog.Footer>
 				</Dialog>
 			</div>
@@ -182,10 +178,10 @@ export default class Profile extends Component<any, any> {
 	}
 
 	// Note: `user` comes from the URL, courtesy of our router
-	render({ user }, {time, count, rpcUser}) {
+	render({ user }) {
 		return (
 			<div className="profile">
-				<this.renderProfileCard rpcUser={rpcUser}/>
+				<this.renderProfileCard user={user}/>
 			</div>
 		);
 	}

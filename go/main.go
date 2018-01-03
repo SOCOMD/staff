@@ -1,10 +1,12 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
+
+	"github.com/SOCOMD/env"
 
 	"github.com/SOCOMD/staff/go/services/dbClient"
 	"github.com/SOCOMD/staff/go/services/ts3BotClient"
@@ -13,27 +15,28 @@ import (
 )
 
 var (
+	e          env.Env
 	webAddress string
-	jwtsecret  []byte
 )
 
 func main() {
+	helpFlag := flag.Bool("help", false, "If Defined will print the help menu")
+	flag.Parse()
+	e = env.Get()
+	if *helpFlag == true {
+		//print all help things and leave
+		fmt.Println(e)
+		return
+	}
+	webAddress = e.Staff.WebHost
+	if len(e.Staff.WebPort) > 0 {
+		webAddress += ":" + e.Staff.WebPort
+	}
 	initialise()
 	cleanup()
 }
 
 func initialise() {
-
-	webHost := os.Getenv("HOST")
-	webHostOverride := os.Getenv("HOST_WEBHOST")
-	if len(webHostOverride) > 0 {
-		fmt.Printf("Using WebHost override!")
-		webHost = webHostOverride
-	}
-
-	webAddress = fmt.Sprintf("%s:%s", webHost, os.Getenv("PORT_WEBHOST"))
-	jwtsecret = []byte(os.Getenv("ACC_JWTSECRET"))
-
 	//Connect Clients
 	dbClient.Connect()
 	ts3BotClient.Connect()
@@ -58,6 +61,6 @@ func hostWebsite() {
 	http.HandleFunc("/steamcallback", steamCallbackHandler)
 	http.HandleFunc("/", handler)
 
-	log.Println("Listening on", webAddress)
-	log.Println(http.ListenAndServe(webAddress, nil))
+	log.Printf("Listening on %s:%s", e.Staff.WebHost, e.Staff.WebPort)
+	log.Println(http.ListenAndServe(e.Staff.WebHost+":"+e.Staff.WebPort, nil))
 }

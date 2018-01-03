@@ -58,7 +58,7 @@ func steamCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		// https://github.com/dgrijalva/jwt-go/blob/master/map_claims.go#L70
 		"exp": time.Now().Add(time.Hour * 24 * 7).Unix(),
 	}
-	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims).SignedString(jwtsecret)
+	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims).SignedString([]byte(e.Staff.JWTSecret))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Printf("Failed to create jwt, err: %s\n", err)

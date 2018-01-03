@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -30,7 +31,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func steamLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if url, err := openid.RedirectURL(
 		"http://steamcommunity.com/openid",
-		"http://"+webAddress+"/api/steamcallback",
+		"http://"+webAddress+"/steamcallback",
 		"http://"+webAddress); err == nil {
 		http.Redirect(w, r, url, http.StatusSeeOther)
 	} else {
@@ -41,17 +42,22 @@ func steamLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func steamCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	fullurl := "http://" + webAddress + r.URL.String()
-	log.Println("CallBack:", fullurl)
+
 	id, err := openid.Verify(fullurl, &nilDiscoveryCache{}, &nilNonceStore{})
 	if err != nil {
 		log.Println("error Verifying:", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
+	id = id[strings.LastIndex(id, "/")+1:]
+	// registerUser will check if the user exsists in our system.
+	// if not will create a entry in the database so they can view
+	// their profile without errors.
+	registerUser(id)
 	// we have confirmed the user has logged in
 	// lets create a token for future requests and store
 	// this token to match future requests.
+
 	Claims := jwt.MapClaims{
 		"steamid": id,
 		// documentation about the use of exp for validation @
@@ -82,4 +88,24 @@ func steamCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	</head>`
 	w.Write([]byte(s))
 
+}
+
+func validateToken(hash string) (steamid string, err error) {
+
+	token, err := jwt.Parse(hash, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method")
+		}
+		return []byte(e.Staff.JWTSecret), nil
+	})
+	if err != nil {
+		return
+	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		steamid, ok = claims["steamid"].(string)
+		if ok == false {
+			err = fmt.Errorf("Failed to get steamid out of token")
+		}
+	}
+	return
 }

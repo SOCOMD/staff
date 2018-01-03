@@ -1,7 +1,6 @@
 package user
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"reflect"
@@ -9,6 +8,29 @@ import (
 	"github.com/SOCOMD/ts3Bot"
 	"github.com/jmoiron/sqlx"
 )
+
+const (
+
+	// Field Const's denote database fields
+
+	FieldID       field = "id"
+	FieldSteamID  field = "steamid"
+	FieldTSDBID   field = "tsdbid"
+	FieldTSUUID   field = "tsuuid"
+	FieldEmail    field = "email"
+	FieldPassword field = "password"
+	FieldJoindate field = "joindate"
+	FieldDOB      field = "dob"
+	FieldGender   field = "gender"
+	FieldAdmin    field = "admin"
+	FieldActive   field = "active"
+)
+
+var (
+	emptyString string
+)
+
+type field string
 
 //User object for db query
 type User struct {
@@ -23,12 +45,8 @@ type User struct {
 	Gender           *string `db:"gender"`
 	Admin            int32   `db:"admin"`
 	Active           int32   `db:"active"`
-	AttendenceCredit int32   `db:"attendenceCredit"`
+	AttendenceCredit *int32  `db:"attendenceCredit"`
 }
-
-var (
-	emptyString string = ""
-)
 
 func (u *User) SafeString(value *string) (result string) {
 	if value == nil {
@@ -61,9 +79,8 @@ func (u *User) reflect() {
 }
 
 //Get returns a single user from the database
-func Get(id int, db *sql.DB) (result User, err error) {
-	dbx := sqlx.NewDb(db, "mysql")
-	err = dbx.Get(&result, "SELECT * FROM user WHERE id=?", id)
+func Get(Type field, value string, db *sqlx.DB) (result User, err error) {
+	err = db.Get(&result, fmt.Sprintf("SELECT * FROM user WHERE %s=?", Type), value)
 	result.reflect()
 	return
 }
@@ -134,17 +151,7 @@ func Validate(steamid string, ts3Uuid string, db *sql.DB) (user User, err error)
 }
 
 //Register a user into the DB with steamid and ts3uuid
-func Register(steamid string, ts3Uuid string, ts3Client ts3Bot.Ts3BotClient, db *sql.DB) (err error) {
-
-	var ts3QueryUser ts3Bot.User
-	ts3QueryUser.Uuid = ts3Uuid
-
-	ts3User, ts3Err := ts3Client.GetUser(context.Background(), &ts3QueryUser)
-	if ts3Err != nil {
-		return ts3Err
-	}
-
-	dbx := sqlx.NewDb(db, "mysql")
-	_, err = dbx.Exec("INSERT INTO user (steamid,tsdbid,tsuuid) VALUES (?,?,?)", steamid, ts3User.Dbid, ts3User.Uuid)
+func Register(steamid string, db *sqlx.DB) (err error) {
+	_, err = db.Exec("INSERT INTO user (steamid) VALUES (?)", steamid)
 	return
 }

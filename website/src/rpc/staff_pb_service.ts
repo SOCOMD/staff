@@ -11,7 +11,15 @@ export namespace staff {
     static readonly service = staff;
     static readonly requestStream = false;
     static readonly responseStream = false;
-    static readonly requestType = staff_pb.GetUserMessage;
+    static readonly requestType = staff_pb.GetUserRequest;
     static readonly responseType = staff_pb.User;
+  }
+  export class AuthStatus {
+    static readonly methodName = "AuthStatus";
+    static readonly service = staff;
+    static readonly requestStream = false;
+    static readonly responseStream = false;
+    static readonly requestType = staff_pb.GetAuthStatusRequest;
+    static readonly responseType = staff_pb.GetAuthStatusResult;
   }
 }

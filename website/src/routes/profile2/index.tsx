@@ -28,15 +28,12 @@ import { User, GetUserRequest } from '../../rpc/staff_pb'
 import { Router } from 'preact-router';
 
 export interface ProfileProps { profileID: string; }
+export interface ProfileState { rpcUser: User.AsObject; }
 
-export default class Profile extends Component<ProfileProps, any> {
+export default class Profile2 extends Component<ProfileProps, ProfileState> {
 
-	timer: any
 
 	scrollingDlg: any
-	state = {
-		rpcUser: null
-	};
 
 	// gets called when this route is navigated to
 	componentDidMount() {
@@ -45,24 +42,13 @@ export default class Profile extends Component<ProfileProps, any> {
 
 	// gets called just before navigating away from the route
 	componentWillUnmount() {
-		clearInterval(this.timer);
-	}
 
-	updateUser = (usr: User) => {
-		this.setState({ rpcUser: usr })
-	};
-
-	extractProfileID() {
-		var url = window.location.href
-		var lastIdx = url.lastIndexOf('/')
-		var profileId = url.substr(lastIdx + 1, url.length - lastIdx)
-		return profileId
 	}
 
 	requestUserData() {
 
 		var request = new GetUserRequest;
-		var profileID = this.extractProfileID()
+
 		var token = sessionStorage.getItem("auth")
 		request.setToken(token)
 		console.log("profileid", this.props.profileID)
@@ -86,74 +72,137 @@ export default class Profile extends Component<ProfileProps, any> {
 				if (response == null) {
 					return
 				}
-
-				this.setFieldValues(response)
+				/*
+					...this.state - spreads all values inside of it out as if they were
+					all manually entered. the following ',rpcUser:' overrides the previous
+					rpcUser that ...this.state put. This way we can keep all over state
+					values presuming we have others, and overwrite only the thing we want
+					to change. 
+				*/
+				this.setState({ ...this.state, rpcUser: response.toObject() })
+				//this.setFieldValues(response)
 			}
-		}
-		)
+		})
 	}
 
-	setFieldValues(rpcUser: User) {
-		if (rpcUser == null) {
-			return;
+
+	render() {
+		var viewMode = false
+		if (this.state.rpcUser == null) {
+			return (<div></div>)
 		}
-
-		this.setState({ rpcUser: rpcUser.toObject() })
-
-		document.getElementById("tsuuid").setAttribute("value", this.state.rpcUser.tsuuid)
-		document.getElementById("tsname").setAttribute("value", this.state.rpcUser.tsname)
-		//document.getElementById("tscreated").setAttribute("value", new Date(parseInt(this.state.rpcUser.tscreated) * 1000).toISOString().slice(0, 10))
-		//document.getElementById("tslastconnected").setAttribute("value", new Date(parseInt(this.state.rpcUser.tslastconnected) * 1000).toISOString().slice(0, 10))
-		document.getElementById("email").setAttribute("value", this.state.rpcUser.email)
-		document.getElementById("joindate").setAttribute("value", this.state.rpcUser.joindate)
-		document.getElementById("dob").setAttribute("value", this.state.rpcUser.dob)
-		document.getElementById("gender").setAttribute("value", this.state.rpcUser.gender)
-		document.getElementById("active").setAttribute("value", this.state.rpcUser.active)
-		document.getElementById("admin").setAttribute("value", this.state.rpcUser.admin)
-
-		//document.getElementById("performUpdate").addEventListener("click", (e:Event) => this.onFormSubmit());
-	}
-
-	renderProfileCard({ user }) {
-
-		var viewMode = true
-
+		var user = this.state.rpcUser
+		console.log("rpcUser", this.state.rpcUser)
 		return (
-			<div>
+			<div className="profile">
 				<Card>
 					<Card.Primary>
-						<h1>Member - {user}</h1>
+						<h1>Member - {user.steamid}</h1>
 						<LayoutGrid>
 							<LayoutGrid.Inner>
 								<LayoutGrid.Cell cols={4}>
-									<TextField id="tsname" fullwidth={true} helperTextPersistent={true} disabled={true} helperText="Teamspeak Name" />
+									<TextField
+										id="tsname"
+										fullwidth={true}
+										helperTextPersistent={true}
+										disabled={true}
+										helperText="Teamspeak Name"
+										value={user.tsname}
+									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField id="email" fullwidth={true} helperTextPersistent={true} disabled={viewMode} helperText="Email" />
+									<TextField
+										id="email"
+										fullwidth={true}
+										helperTextPersistent={true}
+										disabled={viewMode}
+										helperText="Email"
+										value={user.email}
+									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField id="tsuuid" fullwidth={true} helperTextPersistent={true} disabled={viewMode} helperText="Teamspeak Unique ID" />
+									<TextField
+										id="tsuuid"
+										fullwidth={true}
+										helperTextPersistent={true}
+										disabled={viewMode}
+										helperText="Teamspeak Unique ID"
+										value={user.tsuuid}
+									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField id="tscreated" fullwidth={true} helperTextPersistent={true} disabled={true} helperText="Teamspeak Created" type="date" />
+									<TextField
+										id="tscreated"
+										fullwidth={true}
+										helperTextPersistent={true}
+										disabled={true}
+										helperText="Teamspeak Created"
+										type="date"
+										value={new Date(parseInt(user.tscreated) * 1000).toISOString().slice(0, 10)}
+									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField id="tslastconnected" fullwidth={true} helperTextPersistent={true} disabled={true} helperText="Teamspeak Last Connected" type="date" />
+									<TextField
+										id="tslastconnected"
+										fullwidth={true}
+										helperTextPersistent={true}
+										disabled={true}
+										helperText="Teamspeak Last Connected"
+										type="date"
+										value={new Date(parseInt(user.tslastconnected) * 1000).toISOString().slice(0, 10)}
+									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField id="joindate" fullwidth={true} helperTextPersistent={true} disabled={true} helperText="Join Date" type="date" />
+									<TextField
+										id="joindate"
+										fullwidth={true}
+										helperTextPersistent={true}
+										disabled={true}
+										helperText="Join Date"
+										type="date"
+										value={user.joindate}
+									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField id="dob" fullwidth={true} helperTextPersistent={true} disabled={true} helperText="Date of Birth" type="date" />
+									<TextField
+										id="dob"
+										fullwidth={true}
+										helperTextPersistent={true}
+										disabled={true}
+										helperText="Date of Birth"
+										value={user.dob}
+									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField id="gender" fullwidth={true} helperTextPersistent={true} disabled={viewMode} helperText="Gender" />
+									<TextField
+										id="gender"
+										fullwidth={true}
+										helperTextPersistent={true}
+										disabled={viewMode}
+										helperText="Gender"
+										value={user.gender}
+									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField id="active" fullwidth={true} helperTextPersistent={true} disabled={viewMode} helperText="Active" />
+									<TextField
+										id="active"
+										fullwidth={true}
+										helperTextPersistent={true}
+										disabled={viewMode}
+										helperText="Active"
+										value={user.active ? "Yes" : "No"}
+									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
-									<TextField id="admin" fullwidth={true} helperTextPersistent={true} disabled={viewMode} helperText="Admin" type="number" />
+									<TextField
+										id="admin"
+										fullwidth={true}
+										helperTextPersistent={true}
+										disabled={viewMode}
+										helperText="Admin"
+										type="number"
+										value={user.admin.toString()}
+									/>
 								</LayoutGrid.Cell>
 							</LayoutGrid.Inner>
 						</LayoutGrid>
@@ -171,15 +220,6 @@ export default class Profile extends Component<ProfileProps, any> {
 						<Dialog.FooterButton id="performUpdate" accept={true}>Update</Dialog.FooterButton>
 					</Dialog.Footer>
 				</Dialog>
-			</div>
-		)
-	}
-
-	// Note: `user` comes from the URL, courtesy of our router
-	render() {
-		return (
-			<div className="profile">
-				<this.renderProfileCard user={this.props.profileID} />
 			</div>
 		);
 	}

@@ -1,4 +1,4 @@
-// package: 
+// package: staff
 // file: staff.proto
 
 import * as jspb from "google-protobuf";

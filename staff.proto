@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package members;
+package staff;
 
-service members {
+service staff {
 	rpc GetUser(GetUserMessage) returns (User);
 }
 

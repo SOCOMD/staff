@@ -20,7 +20,7 @@ type nilNonceStore struct{}
 func (n *nilNonceStore) Accept(endpoint, nonce string) error { return nil }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fs := http.FileServer(http.Dir("../website/dist/"))
+	fs := http.FileServer(http.Dir("./website/dist/"))
 	if strings.Contains(r.URL.String(), ".") == false {
 		r.URL.Path = "/"
 	}

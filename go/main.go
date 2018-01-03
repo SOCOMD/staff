@@ -7,10 +7,10 @@ import (
 	"net/http"
 
 	"github.com/SOCOMD/env"
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"google.golang.org/grpc"
 
-	"github.com/SOCOMD/staff/go/services/dbClient"
-	"github.com/SOCOMD/staff/go/services/ts3BotClient"
-	"github.com/SOCOMD/staff/go/services/webgrpcServer"
+	pb "github.com/SOCOMD/staff"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -32,35 +32,33 @@ func main() {
 	if len(e.Staff.WebPort) > 0 {
 		webAddress += ":" + e.Staff.WebPort
 	}
-	initialise()
-	cleanup()
-}
 
-func initialise() {
-	//Connect Clients
-	dbClient.Connect()
-	ts3BotClient.Connect()
+	// create grpc server
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(unaryInterceptor))
+	// register our service onto the grpc server. (can register many services if needed)
+	pb.RegisterStaffServer(grpcServer, &server{})
 
-	//Host Servers
-	webgrpcServer.Serve()
-	hostWebsite()
+	// wrap our grpc server in grpc-web so the frontend can talk to it.
+	wrappedServer := grpcweb.WrapServer(grpcServer)
 
-}
-
-func cleanup() {
-	//Disconnect Clients
-	dbClient.Disconnect()
-	ts3BotClient.Disconnect()
-
-	//Disconnect Servers
-	webgrpcServer.Disconnect()
-}
-
-func hostWebsite() {
+	// setup our http server to have a custom handler so each request can first be checked if its
+	// a grpc request before its passed off to the default http serve mux.
+	httpServer := http.Server{
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// if it is a grpc matching request handle it,
+			// otherwise treat as a standard http request
+			if wrappedServer.IsGrpcWebRequest(r) {
+				wrappedServer.ServeHTTP(w, r)
+				return
+			}
+			http.DefaultServeMux.ServeHTTP(w, r)
+		}),
+		Addr: webAddress,
+	}
+	// register http handlers
 	http.HandleFunc("/steamlogin", steamLoginHandler)
 	http.HandleFunc("/steamcallback", steamCallbackHandler)
 	http.HandleFunc("/", handler)
-
-	log.Printf("Listening on %s:%s", e.Staff.WebHost, e.Staff.WebPort)
-	log.Println(http.ListenAndServe(e.Staff.WebHost+":"+e.Staff.WebPort, nil))
+	log.Printf("Listening on %s", webAddress)
+	log.Println(httpServer.ListenAndServe())
 }

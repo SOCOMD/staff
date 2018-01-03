@@ -25,7 +25,7 @@ var (
 )
 
 func Serve() {
-	go serveInternal()
+	serveInternal()
 }
 
 func Disconnect() {

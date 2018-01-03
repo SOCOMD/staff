@@ -1,14 +1,14 @@
-// package: 
+// package: staff
 // file: staff.proto
 
 import * as staff_pb from "./staff_pb";
-export class members {
-  static serviceName = "members";
+export class staff {
+  static serviceName = "staff.staff";
 }
-export namespace members {
+export namespace staff {
   export class GetUser {
     static readonly methodName = "GetUser";
-    static readonly service = members;
+    static readonly service = staff;
     static readonly requestStream = false;
     static readonly responseStream = false;
     static readonly requestType = staff_pb.GetUserMessage;

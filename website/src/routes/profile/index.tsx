@@ -38,8 +38,6 @@ export default class Profile extends Component<any, any> {
 
 	// gets called when this route is navigated to
 	componentDidMount() {
-		// start a timer for the clock:
-		this.timer = setInterval(this.updateTime, 1000);
 		this.requestUserData();
 	}
 
@@ -47,15 +45,6 @@ export default class Profile extends Component<any, any> {
 	componentWillUnmount() {
 		clearInterval(this.timer);
 	}
-
-	// update the current time
-	updateTime = () => {
-		this.setState({ time: Date.now() });
-	};
-
-	increment = () => {
-		this.setState({ count: this.state.count + 1 });
-	};
 
 	updateUser = (usr : User) => {
 		this.setState({rpcUser: usr})

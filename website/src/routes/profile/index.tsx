@@ -25,6 +25,8 @@ import { grpc, BrowserHeaders, Code } from 'grpc-web-client'
 import { members } from '../../rpc/staff_pb_service'
 import { User, GetUserMessage } from '../../rpc/staff_pb'
 
+import { Router } from 'preact-router';
+
 export default class Profile extends Component<any, any> {
 
 	timer: any
@@ -61,11 +63,19 @@ export default class Profile extends Component<any, any> {
 		this.setState({rpcUser: usr})
 	};
 
+	extractProfileID(){
+		var url = window.location.href
+		var lastIdx = url.lastIndexOf('/')
+		var profileId = url.substr(lastIdx + 1, url.length - lastIdx)
+		return profileId
+	}
+
 	requestUserData() {
 
 		//TODO: GET USER ID FROM ROUTE
 		var request = new GetUserMessage;
-		request.setId("277");
+		var profileID = this.extractProfileID()
+		request.setId(profileID);
 
 		grpc.unary(members.GetUser, {
 			debug:true,

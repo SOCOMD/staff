@@ -3,6 +3,22 @@
 
 import * as jspb from "google-protobuf";
 
+export class NilResult extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): NilResult.AsObject;
+  static toObject(includeInstance: boolean, msg: NilResult): NilResult.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: NilResult, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): NilResult;
+  static deserializeBinaryFromReader(message: NilResult, reader: jspb.BinaryReader): NilResult;
+}
+
+export namespace NilResult {
+  export type AsObject = {
+  }
+}
+
 export class GetAuthStatusRequest extends jspb.Message {
   getToken(): string;
   setToken(value: string): void;
@@ -73,6 +89,32 @@ export namespace GetUserRequest {
     EMAIL = 3,
     STEAMID = 4,
     TOKEN = 5,
+  }
+}
+
+export class UpdateUserRequest extends jspb.Message {
+  hasUser(): boolean;
+  clearUser(): void;
+  getUser(): User | undefined;
+  setUser(value?: User): void;
+
+  getToken(): string;
+  setToken(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UpdateUserRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: UpdateUserRequest): UpdateUserRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: UpdateUserRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UpdateUserRequest;
+  static deserializeBinaryFromReader(message: UpdateUserRequest, reader: jspb.BinaryReader): UpdateUserRequest;
+}
+
+export namespace UpdateUserRequest {
+  export type AsObject = {
+    user?: User.AsObject,
+    token: string,
   }
 }
 

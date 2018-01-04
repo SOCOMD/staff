@@ -23,12 +23,13 @@ import './style.css';
 //GRPC Imports
 import { grpc, BrowserHeaders, Code } from 'grpc-web-client'
 import { staff } from '../../rpc/staff_pb_service'
-import { User, GetUserRequest } from '../../rpc/staff_pb'
+import { User, GetUserRequest, UpdateUserRequest } from '../../rpc/staff_pb'
 
 import { Router } from 'preact-router';
+import { Event } from '_debugger';
 
 export interface ProfileProps { profileID: string; }
-export interface ProfileState { rpcUser: User.AsObject; }
+export interface ProfileState { rpcUser: User; }
 
 export default class Profile2 extends Component<ProfileProps, ProfileState> {
 
@@ -79,10 +80,33 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 					values presuming we have others, and overwrite only the thing we want
 					to change. 
 				*/
-				this.setState({ ...this.state, rpcUser: response.toObject() })
+				this.setState({ ...this.state, rpcUser: response })
 				//this.setFieldValues(response)
 			}
 		})
+	}
+
+	updateUserData() {
+		var request = new UpdateUserRequest;
+		var token = sessionStorage.getItem("auth")
+		request.setToken(token)
+		request.setUser(this.state.rpcUser)
+
+		grpc.unary(staff.UpdateUser, {
+			debug: true,
+			request: request,
+			host: window.location.origin,
+			onEnd: res => {
+				const { status, statusMessage, headers, message, trailers } = res;
+				if (status != Code.OK) {
+					console.error(statusMessage);
+				}
+			}
+		})
+	}
+
+	handleEvent(event){
+		console.log(event)
 	}
 
 
@@ -97,7 +121,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 			<div className="profile">
 				<Card>
 					<Card.Primary>
-						<h1>Member - {user.steamid}</h1>
+						<h1>Member - {user.getSteamid()}</h1>
 						<LayoutGrid>
 							<LayoutGrid.Inner>
 								<LayoutGrid.Cell cols={4}>
@@ -107,7 +131,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										helperTextPersistent={true}
 										disabled={true}
 										helperText="Teamspeak Name"
-										value={user.tsname}
+										value={user.getTsname()}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -117,7 +141,8 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										helperTextPersistent={true}
 										disabled={viewMode}
 										helperText="Email"
-										value={user.email}
+										value={user.getEmail()}
+										onChange={((event) => {this.state.rpcUser.setEmail(event.target.value)}).bind(this)}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -127,7 +152,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										helperTextPersistent={true}
 										disabled={viewMode}
 										helperText="Teamspeak Unique ID"
-										value={user.tsuuid}
+										value={user.getTsuuid()}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -138,7 +163,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										disabled={true}
 										helperText="Teamspeak Created"
 										type="date"
-										value={user.tscreated != "" ? new Date(parseInt(user.tscreated) * 1000).toISOString().slice(0, 10) : ""}
+										value={user.getTscreated() != "" ? new Date(parseInt(user.getTscreated()) * 1000).toISOString().slice(0, 10) : ""}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -149,7 +174,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										disabled={true}
 										helperText="Teamspeak Last Connected"
 										type="date"
-										value={user.tslastconnected != "" ? new Date(parseInt(user.tslastconnected) * 1000).toISOString().slice(0, 10) : ""}
+										value={user.getTslastconnected() != "" ? new Date(parseInt(user.getTslastconnected()) * 1000).toISOString().slice(0, 10) : ""}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -160,7 +185,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										disabled={true}
 										helperText="Join Date"
 										type="date"
-										value={user.joindate}
+										value={user.getJoindate()}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -170,7 +195,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										helperTextPersistent={true}
 										disabled={true}
 										helperText="Date of Birth"
-										value={user.dob}
+										value={user.getDob()}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -180,7 +205,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										helperTextPersistent={true}
 										disabled={viewMode}
 										helperText="Gender"
-										value={user.gender}
+										value={user.getGender()}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -190,7 +215,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										helperTextPersistent={true}
 										disabled={viewMode}
 										helperText="Active"
-										value={user.active ? "Yes" : "No"}
+										value={user.getActive() ? "Yes" : "No"}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -201,7 +226,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										disabled={viewMode}
 										helperText="Admin"
 										type="number"
-										value={user.admin.toString()}
+										value={user.getAdmin().toString()}
 									/>
 								</LayoutGrid.Cell>
 							</LayoutGrid.Inner>
@@ -217,7 +242,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 					</Dialog.Body>
 					<Dialog.Footer>
 						<Dialog.FooterButton cancel={true}>Cancel</Dialog.FooterButton>
-						<Dialog.FooterButton id="performUpdate" accept={true}>Update</Dialog.FooterButton>
+						<Dialog.FooterButton onClick={() => {this.updateUserData()}} accept={true}>Update</Dialog.FooterButton>
 					</Dialog.Footer>
 				</Dialog>
 			</div>

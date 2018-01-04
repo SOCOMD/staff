@@ -95,3 +95,7 @@ func (s *server) GetUser(ctx context.Context, userQuery *staff.GetUserRequest) (
 func (s *server) AuthStatus(ctx context.Context, in *staff.GetAuthStatusRequest) (res *staff.GetAuthStatusResult, err error) {
 	return nil, fmt.Errorf("Not Implemented")
 }
+
+func (s *server) UpdateUser(ctx context.Context, userQuery *staff.UpdateUserRequest) (res *staff.NilResult, err error) {
+	return nil, fmt.Errorf("Not Implemented")
+}

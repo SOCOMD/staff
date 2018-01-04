@@ -97,6 +97,8 @@ func (s *server) AuthStatus(ctx context.Context, in *staff.GetAuthStatusRequest)
 }
 
 func (s *server) UpdateUser(ctx context.Context, userQuery *staff.UpdateUserRequest) (res *staff.NilResult, err error) {
+	res = &staff.NilResult{}
+
 	if userQuery.User == nil {
 		return nil, fmt.Errorf("User was nil")
 	}
@@ -106,34 +108,47 @@ func (s *server) UpdateUser(ctx context.Context, userQuery *staff.UpdateUserRequ
 		return
 	}
 
-	usr, err := dbUser.Get(dbUser.FieldSteamID, steamid, s.db)
+	DBUser, err := dbUser.Get(dbUser.FieldSteamID, steamid, s.db)
 	if err != nil {
 		return
 	}
 
-	fmt.Println(userQuery.User)
-
 	webUser := userQuery.User
 
-	*usr.Email = webUser.Email
-	*usr.TeamspeakUUID = webUser.Tsuuid
-	*usr.JoinDate = webUser.Joindate
-	*usr.DoB = webUser.Dob
-	*usr.Gender = webUser.Gender
-	if webUser.Active == true {
-		usr.Active = 1
+	if webUser.Tsuuid != "" {
+		var ts3Query ts3Bot.User
+		ts3Query.Uuid = webUser.Tsuuid
+		ts3User, ts3err := s.ts3botClient.GetUser(context.Background(), &ts3Query)
+		if ts3err != nil {
+			return
+		}
+
+		*DBUser.TeamspeakID = ts3User.Dbid
+		*DBUser.TeamspeakUUID = webUser.Tsuuid
 	} else {
-		usr.Active = 0
+		DBUser.TeamspeakID = nil
+		DBUser.TeamspeakUUID = nil
 	}
 
-	usr.Admin = webUser.Admin
+	fmt.Println(userQuery.User)
 
-	err = dbUser.Update(usr, s.db)
+	*DBUser.Email = webUser.Email
+	*DBUser.JoinDate = webUser.Joindate
+	*DBUser.DoB = webUser.Dob
+	*DBUser.Gender = webUser.Gender
+	if webUser.Active == true {
+		DBUser.Active = 1
+	} else {
+		DBUser.Active = 0
+	}
+
+	DBUser.Admin = webUser.Admin
+
+	err = dbUser.Update(DBUser, s.db)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
 
-	res = &staff.NilResult{}
 	return
 }

@@ -97,16 +97,16 @@ func Update(user User, db *sqlx.DB) (err error) {
 		active=?,
 		attendenceCredit=?
 		WHERE steamid=?`,
-		*user.TeamspeakUUID,
-		*user.TeamspeakID,
-		*user.Email,
-		*user.JoinDate,
-		*user.DoB,
-		*user.Gender,
+		user.TeamspeakUUID,
+		user.TeamspeakID,
+		user.Email,
+		user.JoinDate,
+		user.DoB,
+		user.Gender,
 		user.Admin,
 		user.Active,
 		user.AttendenceCredit,
-		*user.SteamID)
+		user.SteamID)
 	return
 }
 

@@ -11,7 +11,10 @@ export default class Login extends Component<any, any> {
 	render() {
 		return (
 			<div>
-				Login Screen
+				<div>
+					Login Screen
+				</div>
+				<a href="/steamlogin"><button>Steam Login (insert steam logo)</button></a>
 			</div>
 		)
 	}

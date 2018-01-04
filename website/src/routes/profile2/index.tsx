@@ -152,34 +152,10 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
 									<TextField
-										id="tscreated"
-										fullwidth={true}
-										helperTextPersistent={true}
-										disabled={true}
-										helperText="Teamspeak Created"
-										type="date"
-										value={user.getTscreated() != "" ? new Date(parseInt(user.getTscreated()) * 1000).toISOString().slice(0, 10) : ""}
-										onChange={((event) => {this.state.rpcUser.setTscreated(event.target.value)}).bind(this)}
-									/>
-								</LayoutGrid.Cell>
-								<LayoutGrid.Cell cols={4}>
-									<TextField
-										id="tslastconnected"
-										fullwidth={true}
-										helperTextPersistent={true}
-										disabled={true}
-										helperText="Teamspeak Last Connected"
-										type="date"
-										value={user.getTslastconnected() != "" ? new Date(parseInt(user.getTslastconnected()) * 1000).toISOString().slice(0, 10) : ""}
-										onChange={((event) => {this.state.rpcUser.setTslastconnected(event.target.value)}).bind(this)}
-									/>
-								</LayoutGrid.Cell>
-								<LayoutGrid.Cell cols={4}>
-									<TextField
 										id="joindate"
 										fullwidth={true}
 										helperTextPersistent={true}
-										disabled={true}
+										disabled={viewMode}
 										helperText="Join Date"
 										type="date"
 										value={user.getJoindate()}
@@ -191,8 +167,9 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										id="dob"
 										fullwidth={true}
 										helperTextPersistent={true}
-										disabled={true}
+										disabled={viewMode}
 										helperText="Date of Birth"
+										type="date"
 										value={user.getDob()}
 										onChange={((event) => {this.state.rpcUser.setDob(event.target.value)}).bind(this)}
 									/>

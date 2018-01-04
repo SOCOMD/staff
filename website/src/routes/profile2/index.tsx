@@ -138,7 +138,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										disabled={true}
 										helperText="Teamspeak Created"
 										type="date"
-										value={new Date(parseInt(user.tscreated) * 1000).toISOString().slice(0, 10)}
+										value={user.tscreated != "" ? new Date(parseInt(user.tscreated) * 1000).toISOString().slice(0, 10) : ""}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -149,7 +149,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										disabled={true}
 										helperText="Teamspeak Last Connected"
 										type="date"
-										value={new Date(parseInt(user.tslastconnected) * 1000).toISOString().slice(0, 10)}
+										value={user.tslastconnected != "" ? new Date(parseInt(user.tslastconnected) * 1000).toISOString().slice(0, 10) : ""}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>

@@ -83,7 +83,7 @@ func steamCallbackHandler(w http.ResponseWriter, r *http.Request) {
 				localStorage.auth=token;
 				sessionStorage.removeItem('auth');
 			}
-			window.location='http://` + webAddress + `/';
+			window.location='http://` + webAddress + `/profile';
 		</script>
 	</head>`
 	w.Write([]byte(s))

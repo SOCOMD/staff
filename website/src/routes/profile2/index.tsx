@@ -105,18 +105,12 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 		})
 	}
 
-	handleEvent(event){
-		console.log(event)
-	}
-
-
 	render() {
 		var viewMode = false
 		if (this.state.rpcUser == null) {
 			return (<div></div>)
 		}
 		var user = this.state.rpcUser
-		console.log("rpcUser", this.state.rpcUser)
 		return (
 			<div className="profile">
 				<Card>
@@ -153,6 +147,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										disabled={viewMode}
 										helperText="Teamspeak Unique ID"
 										value={user.getTsuuid()}
+										onChange={((event) => {this.state.rpcUser.setTsuuid(event.target.value)}).bind(this)}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -164,6 +159,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										helperText="Teamspeak Created"
 										type="date"
 										value={user.getTscreated() != "" ? new Date(parseInt(user.getTscreated()) * 1000).toISOString().slice(0, 10) : ""}
+										onChange={((event) => {this.state.rpcUser.setTscreated(event.target.value)}).bind(this)}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -175,6 +171,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										helperText="Teamspeak Last Connected"
 										type="date"
 										value={user.getTslastconnected() != "" ? new Date(parseInt(user.getTslastconnected()) * 1000).toISOString().slice(0, 10) : ""}
+										onChange={((event) => {this.state.rpcUser.setTslastconnected(event.target.value)}).bind(this)}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -186,6 +183,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										helperText="Join Date"
 										type="date"
 										value={user.getJoindate()}
+										onChange={((event) => {this.state.rpcUser.setJoindate(event.target.value)}).bind(this)}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -196,6 +194,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										disabled={true}
 										helperText="Date of Birth"
 										value={user.getDob()}
+										onChange={((event) => {this.state.rpcUser.setDob(event.target.value)}).bind(this)}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -206,6 +205,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										disabled={viewMode}
 										helperText="Gender"
 										value={user.getGender()}
+										onChange={((event) => {this.state.rpcUser.setGender(event.target.value)}).bind(this)}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -216,6 +216,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										disabled={viewMode}
 										helperText="Active"
 										value={user.getActive() ? "Yes" : "No"}
+										onChange={((event) => {this.state.rpcUser.setActive(event.target.value)}).bind(this)}
 									/>
 								</LayoutGrid.Cell>
 								<LayoutGrid.Cell cols={4}>
@@ -227,6 +228,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 										helperText="Admin"
 										type="number"
 										value={user.getAdmin().toString()}
+										onChange={((event) => {this.state.rpcUser.setAdmin(event.target.value)}).bind(this)}
 									/>
 								</LayoutGrid.Cell>
 							</LayoutGrid.Inner>

@@ -97,5 +97,43 @@ func (s *server) AuthStatus(ctx context.Context, in *staff.GetAuthStatusRequest)
 }
 
 func (s *server) UpdateUser(ctx context.Context, userQuery *staff.UpdateUserRequest) (res *staff.NilResult, err error) {
-	return nil, fmt.Errorf("Not Implemented")
+	if userQuery.User == nil {
+		return nil, fmt.Errorf("User was nil")
+	}
+
+	steamid, err := validateToken(userQuery.Token)
+	if err != nil {
+		return
+	}
+
+	usr, err := dbUser.Get(dbUser.FieldSteamID, steamid, s.db)
+	if err != nil {
+		return
+	}
+
+	fmt.Println(userQuery.User)
+
+	webUser := userQuery.User
+
+	*usr.Email = webUser.Email
+	*usr.TeamspeakUUID = webUser.Tsuuid
+	*usr.JoinDate = webUser.Joindate
+	*usr.DoB = webUser.Dob
+	*usr.Gender = webUser.Gender
+	if webUser.Active == true {
+		usr.Active = 1
+	} else {
+		usr.Active = 0
+	}
+
+	usr.Admin = webUser.Admin
+
+	err = dbUser.Update(usr, s.db)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	res = &staff.NilResult{}
+	return
 }

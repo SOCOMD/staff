@@ -56,9 +56,8 @@ func (u *User) SafeString(value *string) (result string) {
 }
 
 //GetAll returns a list of all users from the database
-func GetAll(db *sql.DB) (result []User, err error) {
-	dbx := sqlx.NewDb(db, "mysql")
-	err = dbx.Select(&result, "SELECT * FROM user")
+func GetAll(db *sqlx.DB) (result []User, err error) {
+	err = db.Select(&result, "SELECT * FROM user")
 	for _, user := range result {
 		user.reflect()
 	}
@@ -85,42 +84,29 @@ func Get(Type field, value string, db *sqlx.DB) (result User, err error) {
 	return
 }
 
-//UpdateAll will update multiple users at once in the db
-func UpdateAll(users []User, db *sql.DB) {
-	for _, user := range users {
-		updateErr := Update(user, db)
-		if updateErr != nil {
-			fmt.Println(updateErr.Error())
-		}
-	}
-}
-
 //Update updates a single user in the db
-func Update(user User, db *sql.DB) (err error) {
-	dbx := sqlx.NewDb(db, "mysql")
-	_, err = dbx.Exec(`UPDATE user SET 
-		steamid=?,
+func Update(user User, db *sqlx.DB) (err error) {
+	_, err = db.Exec(`UPDATE user SET
+		tsuuid=?,
 		tsdbid=?,
 		email=?,
-		password=?,
 		joindate=?,
 		dob=?,
 		gender=?,
 		admin=?,
 		active=?,
 		attendenceCredit=?
-		WHERE id=?`,
-		user.SteamID,
-		user.TeamspeakID,
-		user.Email,
-		user.Password,
-		user.JoinDate,
-		user.DoB,
-		user.Gender,
+		WHERE steamid=?`,
+		*user.TeamspeakUUID,
+		*user.TeamspeakID,
+		*user.Email,
+		*user.JoinDate,
+		*user.DoB,
+		*user.Gender,
 		user.Admin,
 		user.Active,
 		user.AttendenceCredit,
-		user.ID)
+		*user.SteamID)
 	return
 }
 

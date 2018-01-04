@@ -40,6 +40,9 @@ export namespace GetAuthStatusRequest {
 }
 
 export class GetAuthStatusResult extends jspb.Message {
+  getAdmin(): number;
+  setAdmin(value: number): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetAuthStatusResult.AsObject;
   static toObject(includeInstance: boolean, msg: GetAuthStatusResult): GetAuthStatusResult.AsObject;
@@ -52,6 +55,7 @@ export class GetAuthStatusResult extends jspb.Message {
 
 export namespace GetAuthStatusResult {
   export type AsObject = {
+    admin: number,
   }
 }
 

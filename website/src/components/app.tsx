@@ -11,7 +11,8 @@ import { grpc, BrowserHeaders, Code } from 'grpc-web-client'
 import { staff } from '../rpc/staff_pb_service'
 import { GetAuthStatusRequest, GetAuthStatusResult } from '../rpc/staff_pb'
 
-export default class App extends Component<any, any> {
+export interface AppState { admin: Number }
+export default class App extends Component<any, AppState> {
 
 	currentUrl: string
 
@@ -62,7 +63,7 @@ export default class App extends Component<any, any> {
 	render() {
 		return (
 			<div>
-				<Header />
+				<Header admin={this.state.admin} />
 				<Router onChange={this.handleRoute}>
 					<Login path="/login" />
 					<DashBoard path="/" />

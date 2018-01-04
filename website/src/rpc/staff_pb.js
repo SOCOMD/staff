@@ -323,7 +323,7 @@ proto.staff.GetAuthStatusResult.prototype.toObject = function(opt_includeInstanc
  */
 proto.staff.GetAuthStatusResult.toObject = function(includeInstance, msg) {
   var f, obj = {
-
+    admin: jspb.Message.getFieldWithDefault(msg, 1, 0)
   };
 
   if (includeInstance) {
@@ -360,6 +360,10 @@ proto.staff.GetAuthStatusResult.deserializeBinaryFromReader = function(msg, read
     }
     var field = reader.getFieldNumber();
     switch (field) {
+    case 1:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setAdmin(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -389,6 +393,28 @@ proto.staff.GetAuthStatusResult.prototype.serializeBinary = function() {
  */
 proto.staff.GetAuthStatusResult.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getAdmin();
+  if (f !== 0) {
+    writer.writeInt32(
+      1,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional int32 admin = 1;
+ * @return {number}
+ */
+proto.staff.GetAuthStatusResult.prototype.getAdmin = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/** @param {number} value */
+proto.staff.GetAuthStatusResult.prototype.setAdmin = function(value) {
+  jspb.Message.setProto3IntField(this, 1, value);
 };
 
 

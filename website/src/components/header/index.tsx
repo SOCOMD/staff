@@ -9,7 +9,10 @@ const styles = {
 	},
 };
 
-export default class Header extends Component<any, any> {
+export interface HeaderProps { admin: Number }
+
+export default class Header extends Component<HeaderProps, any> {
+
 	render() {
 
 		return (
@@ -19,8 +22,8 @@ export default class Header extends Component<any, any> {
 						<Typography type="title" color="inherit">
 							Socomd
 						</Typography>
-						<Link activeClassName="active" href="/">Home</Link>
-						<Link activeClassName="active" href="/profile">Profile</Link>
+						<Link activeClassName="active" href={this.props.admin ? "/" : "/profile"}>Home</Link>
+						{this.props.admin ? <Link activeClassName="active" href="/profile">Profile</Link> : null}
 					</Toolbar>
 				</AppBar>
 			</div>

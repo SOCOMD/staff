@@ -14,7 +14,9 @@ message GetAuthStatusRequest {
 	string token = 1;
 }
 
-message GetAuthStatusResult {}
+message GetAuthStatusResult {
+	int32 admin = 1;
+}
 
 message GetUserRequest {
 	string search = 1;

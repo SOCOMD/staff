@@ -94,7 +94,12 @@ func (s *server) GetUser(ctx context.Context, userQuery *staff.GetUserRequest) (
 
 func (s *server) AuthStatus(ctx context.Context, in *staff.GetAuthStatusRequest) (res *staff.GetAuthStatusResult, err error) {
 	res = &staff.GetAuthStatusResult{}
-	_, err = validateToken(in.GetToken())
+	steamid, err := validateToken(in.GetToken())
+	u, err := dbUser.Get(dbUser.FieldSteamID, steamid, s.db)
+	if err != nil {
+		return
+	}
+	res.Admin = u.Admin
 	return
 }
 

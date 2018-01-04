@@ -1,7 +1,7 @@
 var path = require( 'path' );
 var ExtractTextPlugin = require( "extract-text-webpack-plugin" );
 var copyWebpackPlugin = require( "copy-webpack-plugin" );
-var webpack = require("webpack");
+var webpack = require( "webpack" );
 module.exports = {
 	devtool: 'source-map',
 	entry: [ './src/index' ],
@@ -11,6 +11,12 @@ module.exports = {
 	},
 	resolve: {
 		extensions: [ '.js', '.ts', '.tsx' ],
+		alias: {
+			'react': 'preact-compat',
+			'react-dom': 'preact-compat',
+			// Not necessary unless you consume a module using `createClass`
+			'create-react-class': 'preact-compat/lib/create-react-class'
+		},
 	},
 	module: {
 		loaders: [ {
@@ -32,8 +38,8 @@ module.exports = {
 	},
 	plugins: [
 		new copyWebpackPlugin( [ { from: 'src/assets/' } ] ),
-		new webpack.EnvironmentPlugin({
-			webgrpc_host:"http://192.168.0.15:8081"
-		})
+		new webpack.EnvironmentPlugin( {
+			webgrpc_host: "http://192.168.0.15:8081"
+		} )
 	]
 };

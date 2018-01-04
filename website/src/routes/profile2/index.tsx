@@ -1,16 +1,7 @@
 import { h, Component } from 'preact';
 
-import Button from 'preact-material-components/Button';
-import 'preact-material-components/Button/style.css';
-
-import Card from 'preact-material-components/Card';
-import 'preact-material-components/Card/style.css';
-
 import TextField from 'preact-material-components/TextField';
 import 'preact-material-components/TextField/style.css';
-
-import LayoutGrid from 'preact-material-components/LayoutGrid';
-import 'preact-material-components/LayoutGrid/style.css';
 
 import Dialog from 'preact-material-components/Dialog';
 import 'preact-material-components/Dialog/style.css';
@@ -19,6 +10,10 @@ import List from 'preact-material-components/List';
 import 'preact-material-components/Dialog/style.css';
 
 import './style.css';
+
+
+import { Grid, Paper, Button } from "material-ui"
+
 
 //GRPC Imports
 import { grpc, BrowserHeaders, Code } from 'grpc-web-client'
@@ -60,7 +55,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 			request.setType(GetUserRequest.searchType.STEAMID)
 		}
 		grpc.unary(staff.GetUser, {
-			debug: true,
+			debug: false,
 			request: request,
 			host: window.location.origin,
 			onEnd: res => {
@@ -93,7 +88,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 		request.setUser(this.state.rpcUser)
 
 		grpc.unary(staff.UpdateUser, {
-			debug: true,
+			debug: false,
 			request: request,
 			host: window.location.origin,
 			onEnd: res => {
@@ -113,106 +108,103 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 		var user = this.state.rpcUser
 		return (
 			<div className="profile">
-				<Card>
-					<Card.Primary>
-						<h1>Member - {user.getSteamid()}</h1>
-						<LayoutGrid>
-							<LayoutGrid.Inner>
-								<LayoutGrid.Cell cols={4}>
-									<TextField
-										id="tsname"
-										fullwidth={true}
-										helperTextPersistent={true}
-										disabled={true}
-										helperText="Teamspeak Name"
-										value={user.getTsname()}
-									/>
-								</LayoutGrid.Cell>
-								<LayoutGrid.Cell cols={4}>
-									<TextField
-										id="email"
-										fullwidth={true}
-										helperTextPersistent={true}
-										disabled={viewMode}
-										helperText="Email"
-										value={user.getEmail()}
-										onChange={((event) => {this.state.rpcUser.setEmail(event.target.value)}).bind(this)}
-									/>
-								</LayoutGrid.Cell>
-								<LayoutGrid.Cell cols={4}>
-									<TextField
-										id="tsuuid"
-										fullwidth={true}
-										helperTextPersistent={true}
-										disabled={viewMode}
-										helperText="Teamspeak Unique ID"
-										value={user.getTsuuid()}
-										onChange={((event) => {this.state.rpcUser.setTsuuid(event.target.value)}).bind(this)}
-									/>
-								</LayoutGrid.Cell>
-								<LayoutGrid.Cell cols={4}>
-									<TextField
-										id="joindate"
-										fullwidth={true}
-										helperTextPersistent={true}
-										disabled={viewMode}
-										helperText="Join Date"
-										type="date"
-										value={user.getJoindate()}
-										onChange={((event) => {this.state.rpcUser.setJoindate(event.target.value)}).bind(this)}
-									/>
-								</LayoutGrid.Cell>
-								<LayoutGrid.Cell cols={4}>
-									<TextField
-										id="dob"
-										fullwidth={true}
-										helperTextPersistent={true}
-										disabled={viewMode}
-										helperText="Date of Birth"
-										type="date"
-										value={user.getDob()}
-										onChange={((event) => {this.state.rpcUser.setDob(event.target.value)}).bind(this)}
-									/>
-								</LayoutGrid.Cell>
-								<LayoutGrid.Cell cols={4}>
-									<TextField
-										id="gender"
-										fullwidth={true}
-										helperTextPersistent={true}
-										disabled={viewMode}
-										helperText="Gender"
-										value={user.getGender()}
-										onChange={((event) => {this.state.rpcUser.setGender(event.target.value)}).bind(this)}
-									/>
-								</LayoutGrid.Cell>
-								<LayoutGrid.Cell cols={4}>
-									<TextField
-										id="active"
-										fullwidth={true}
-										helperTextPersistent={true}
-										disabled={viewMode}
-										helperText="Active"
-										value={user.getActive() ? "Yes" : "No"}
-										onChange={((event) => {this.state.rpcUser.setActive(event.target.value)}).bind(this)}
-									/>
-								</LayoutGrid.Cell>
-								<LayoutGrid.Cell cols={4}>
-									<TextField
-										id="admin"
-										fullwidth={true}
-										helperTextPersistent={true}
-										disabled={viewMode}
-										helperText="Admin"
-										type="number"
-										value={user.getAdmin().toString()}
-										onChange={((event) => {this.state.rpcUser.setAdmin(event.target.value)}).bind(this)}
-									/>
-								</LayoutGrid.Cell>
-							</LayoutGrid.Inner>
-						</LayoutGrid>
-					</Card.Primary>
-					<Card.Action onClick={() => { this.scrollingDlg.MDComponent.show(); }}>Update</Card.Action>
-				</Card>
+				<Paper style={{ padding: '20px' }}>
+
+					<h1>Member - {user.getSteamid()}</h1>
+					<Grid container spacing={24}>
+						<Grid item sm={4}>
+							<TextField
+								id="tsname"
+								fullwidth={true}
+								helperTextPersistent={true}
+								disabled={true}
+								helperText="Teamspeak Name"
+								value={user.getTsname()}
+							/>
+						</Grid>
+						<Grid item sm={4}>
+							<TextField
+								id="email"
+								fullwidth={true}
+								helperTextPersistent={true}
+								disabled={viewMode}
+								helperText="Email"
+								value={user.getEmail()}
+								onChange={((event) => { this.state.rpcUser.setEmail(event.target.value) }).bind(this)}
+							/>
+						</Grid>
+						<Grid item sm={4}>
+							<TextField
+								id="tsuuid"
+								fullwidth={true}
+								helperTextPersistent={true}
+								disabled={viewMode}
+								helperText="Teamspeak Unique ID"
+								value={user.getTsuuid()}
+								onChange={((event) => { this.state.rpcUser.setTsuuid(event.target.value) }).bind(this)}
+							/>
+						</Grid>
+						<Grid item sm={4}>
+							<TextField
+								id="joindate"
+								fullwidth={true}
+								helperTextPersistent={true}
+								disabled={viewMode}
+								helperText="Join Date"
+								type="date"
+								value={user.getJoindate()}
+								onChange={((event) => { this.state.rpcUser.setJoindate(event.target.value) }).bind(this)}
+							/>
+						</Grid>
+						<Grid item sm={4}>
+							<TextField
+								id="dob"
+								fullwidth={true}
+								helperTextPersistent={true}
+								disabled={viewMode}
+								helperText="Date of Birth"
+								type="date"
+								value={user.getDob()}
+								onChange={((event) => { this.state.rpcUser.setDob(event.target.value) }).bind(this)}
+							/>
+						</Grid>
+						<Grid item sm={4}>
+							<TextField
+								id="gender"
+								fullwidth={true}
+								helperTextPersistent={true}
+								disabled={viewMode}
+								helperText="Gender"
+								value={user.getGender()}
+								onChange={((event) => { this.state.rpcUser.setGender(event.target.value) }).bind(this)}
+							/>
+						</Grid>
+						<Grid item sm={4}>
+							<TextField
+								id="active"
+								fullwidth={true}
+								helperTextPersistent={true}
+								disabled={viewMode}
+								helperText="Active"
+								value={user.getActive() ? "Yes" : "No"}
+								onChange={((event) => { this.state.rpcUser.setActive(event.target.value) }).bind(this)}
+							/>
+						</Grid>
+						<Grid item sm={4}>
+							<TextField
+								id="admin"
+								fullwidth={true}
+								helperTextPersistent={true}
+								disabled={viewMode}
+								helperText="Admin"
+								type="number"
+								value={user.getAdmin().toString()}
+								onChange={((event) => { this.state.rpcUser.setAdmin(event.target.value) }).bind(this)}
+							/>
+						</Grid>
+					</Grid>
+					<Button onClick={() => { this.scrollingDlg.MDComponent.show(); }}>Update</Button>
+				</Paper>
 
 				<Dialog ref={scrollingDlg => { this.scrollingDlg = scrollingDlg; }}>
 					<Dialog.Header>Updating Profile</Dialog.Header>
@@ -221,7 +213,7 @@ export default class Profile2 extends Component<ProfileProps, ProfileState> {
 					</Dialog.Body>
 					<Dialog.Footer>
 						<Dialog.FooterButton cancel={true}>Cancel</Dialog.FooterButton>
-						<Dialog.FooterButton onClick={() => {this.updateUserData()}} accept={true}>Update</Dialog.FooterButton>
+						<Dialog.FooterButton onClick={() => { this.updateUserData() }} accept={true}>Update</Dialog.FooterButton>
 					</Dialog.Footer>
 				</Dialog>
 			</div>

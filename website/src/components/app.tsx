@@ -19,6 +19,7 @@ export default class App extends Component<any, any> {
 		console.log("Url:", this.currentUrl)
 		if (this.currentUrl != "/login") {
 			var token = sessionStorage.getItem("auth")
+			console.log("Token", token)
 			if (token == null || token.length == 0) {
 				console.log("Invalid token")
 				route("/login", true)
@@ -26,7 +27,7 @@ export default class App extends Component<any, any> {
 			var request = new GetAuthStatusRequest
 			request.setToken(token)
 
-			grpc.unary(staff.GetUser, {
+			grpc.unary(staff.AuthStatus, {
 				debug: true,
 				request: request,
 				host: window.location.origin,

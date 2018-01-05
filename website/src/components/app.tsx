@@ -4,7 +4,6 @@ import { Router, route } from 'preact-router'
 import Header from './header'
 import DashBoard from '../routes/Dashboard'
 import Profile from '../routes/profile'
-import Profile2 from '../routes/profile2'
 import Login from '../routes/login'
 
 import { grpc, BrowserHeaders, Code } from 'grpc-web-client'
@@ -29,7 +28,7 @@ export default class App extends Component<any, AppState> {
 			request.setToken(token)
 
 			grpc.unary(staff.AuthStatus, {
-				debug: true,
+				debug: false,
 				request: request,
 				host: window.location.origin,
 				onEnd: res => {
@@ -67,8 +66,8 @@ export default class App extends Component<any, AppState> {
 				<Router onChange={this.handleRoute}>
 					<Login path="/login" />
 					<DashBoard path="/" />
-					<Profile2 path="/profile/" profileID="" />
-					<Profile2 path="/profile/:profileID" profileID="" />
+					<Profile path="/profile/" profileID="" self={true} />
+					<Profile path="/profile/:profileID" profileID="" self={false} />
 				</Router>
 			</div>
 		)

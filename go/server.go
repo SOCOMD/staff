@@ -104,6 +104,7 @@ func (s *server) AuthStatus(ctx context.Context, in *staff.GetAuthStatusRequest)
 }
 
 func (s *server) UpdateUser(ctx context.Context, userQuery *staff.UpdateUserRequest) (res *staff.NilResult, err error) {
+	fmt.Println("Update User Called")
 	res = &staff.NilResult{}
 
 	if userQuery.User == nil {
@@ -137,7 +138,7 @@ func (s *server) UpdateUser(ctx context.Context, userQuery *staff.UpdateUserRequ
 		DBUser.TeamspeakUUID = nil
 	}
 
-	fmt.Println(userQuery.User)
+	fmt.Printf("%#v\n", userQuery.User)
 
 	*DBUser.Email = webUser.Email
 	*DBUser.JoinDate = webUser.Joindate
